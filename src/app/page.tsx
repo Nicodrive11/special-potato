@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-// Removed unused Image import
+import Image from 'next/image';
 
 interface Task {
   id: number;
@@ -25,34 +25,125 @@ interface Stats {
 export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiStatus, setApiStatus] = useState<string>('');
   const [stats, setStats] = useState<Stats>({
     total: 0,
     completed: 0,
     inProgress: 0,
     pending: 0
   });
-  const textStyle = { color: '#111827' };
 
   useEffect(() => {
-    // Use mock data for now
-    const mockTasks: Task[] = [
-      { id: 1, title: 'Design new homepage', status: 'in-progress', priority: 'high', dueDate: '2025-05-30' },
-      { id: 2, title: 'Fix login bug', status: 'pending', priority: 'urgent', dueDate: '2025-05-26' },
-      { id: 3, title: 'Update documentation', status: 'completed', priority: 'medium', dueDate: '2025-05-25' },
-      { id: 4, title: 'Code review for API', status: 'pending', priority: 'high', dueDate: '2025-05-28' }
-    ];
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        
+        // Try to fetch from the API root first to see what's available
+        console.log('Testing API connection...');
+        
+        const rootResponse = await fetch('https://sd-6310-2025-summer-express-app.onrender.com/', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (rootResponse.ok) {
+          const rootData = await rootResponse.text();
+          console.log('API Root Response:', rootData);
+          
+          // Try different possible endpoints
+          const endpoints = ['/tasks', '/api/tasks', '/todos', '/items', '/task'];
+          let foundData = false;
+          
+          for (const endpoint of endpoints) {
+            try {
+              console.log(`Trying endpoint: ${endpoint}`);
+              const response = await fetch(`https://sd-6310-2025-summer-express-app.onrender.com${endpoint}`);
+              
+              if (response.ok) {
+                const data = await response.json();
+                console.log(`Success with ${endpoint}:`, data);
+                
+                // Convert API data to our format
+                let apiTasks: Task[] = [];
+                
+                if (Array.isArray(data)) {
+                  apiTasks = data.map((item: any, index: number) => ({
+                    id: item.id || index + 1,
+                    title: item.title || item.name || `API Task ${index + 1}`,
+                    description: item.description || '',
+                    status: (item.status === 'completed' || item.status === 'done') ? 'completed' : 
+                           (item.status === 'in-progress' || item.status === 'active') ? 'in-progress' : 'pending',
+                    priority: item.priority || 'medium',
+                    dueDate: item.dueDate || item.due,
+                    createdAt: item.createdAt || new Date().toISOString().split('T')[0],
+                  }));
+                } else if (data.tasks || data.data) {
+                  const items = data.tasks || data.data;
+                  apiTasks = items.map((item: any, index: number) => ({
+                    id: item.id || index + 1,
+                    title: item.title || item.name || `API Task ${index + 1}`,
+                    description: item.description || '',
+                    status: (item.status === 'completed' || item.status === 'done') ? 'completed' : 
+                           (item.status === 'in-progress' || item.status === 'active') ? 'in-progress' : 'pending',
+                    priority: item.priority || 'medium',
+                    dueDate: item.dueDate || item.due,
+                    createdAt: item.createdAt || new Date().toISOString().split('T')[0],
+                  }));
+                }
+                
+                if (apiTasks.length > 0) {
+                  setTasks(apiTasks);
+                  setApiStatus(`✅ Connected to API: ${endpoint} (${apiTasks.length} items)`);
+                  foundData = true;
+                  break;
+                }
+              }
+            } catch (err) {
+              console.log(`Endpoint ${endpoint} failed:`, err);
+            }
+          }
+          
+          if (!foundData) {
+            throw new Error('No working endpoints found');
+          }
+        } else {
+          throw new Error('API server not responding');
+        }
+        
+      } catch (error) {
+        console.warn('API completely unavailable, using mock data:', error);
+        setApiStatus('⚠️ API unavailable - showing sample data');
+        
+        // Use mock data as fallback
+        const mockTasks: Task[] = [
+          { id: 1, title: 'Design new homepage', status: 'in-progress', priority: 'high', dueDate: '2025-05-30' },
+          { id: 2, title: 'Fix login bug', status: 'pending', priority: 'urgent', dueDate: '2025-05-26' },
+          { id: 3, title: 'Update documentation', status: 'completed', priority: 'medium', dueDate: '2025-05-25' },
+          { id: 4, title: 'Code review for API', status: 'pending', priority: 'high', dueDate: '2025-05-28' },
+          { id: 5, title: 'Setup deployment pipeline', status: 'in-progress', priority: 'medium', dueDate: '2025-06-01' }
+        ];
+        
+        setTasks(mockTasks);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setTasks(mockTasks);
-    
+    fetchTasks();
+  }, []);
+
+  // Calculate stats whenever tasks change
+  useEffect(() => {
     const newStats: Stats = {
-      total: mockTasks.length,
-      completed: mockTasks.filter(task => task.status === 'completed').length,
-      inProgress: mockTasks.filter(task => task.status === 'in-progress').length,
-      pending: mockTasks.filter(task => task.status === 'pending').length
+      total: tasks.length,
+      completed: tasks.filter(task => task.status === 'completed').length,
+      inProgress: tasks.filter(task => task.status === 'in-progress').length,
+      pending: tasks.filter(task => task.status === 'pending').length
     };
     setStats(newStats);
-    setLoading(false);
-  }, []);
+  }, [tasks]);
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {
@@ -74,8 +165,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" style={textStyle}>
-      {/* Simple Navigation */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Navigation */}
       <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -107,6 +198,15 @@ export default function Dashboard() {
           <p className="text-gray-600">
             Manage your tasks efficiently with our intuitive kanban board system.
           </p>
+          {apiStatus && (
+            <div className={`mt-2 p-3 border rounded-md text-sm ${
+              apiStatus.includes('✅') 
+                ? 'bg-green-100 border-green-400 text-green-700' 
+                : 'bg-yellow-100 border-yellow-400 text-yellow-700'
+            }`}>
+              {apiStatus}
+            </div>
+          )}
         </div>
 
         {/* Hero Section */}
@@ -131,8 +231,16 @@ export default function Dashboard() {
               </Link>
             </div>
             <div className="md:w-1/2 flex justify-center">
-              <div className="w-64 h-48 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                <span className="text-indigo text-lg font-semibold">📋 Kanban Board</span>
+              <div className="w-64 h-48 bg-white bg-opacity-20 rounded-lg flex items-center justify-center relative">
+                <Image
+                  src="/next.svg"
+                  alt="TaskFlow Kanban Board"
+                  width={100}
+                  height={40}
+                  className="opacity-75"
+                  style={{ width: 'auto', height: 'auto' }}
+                />
+                <span className="absolute bottom-4 text-indigo-100 text-sm font-semibold">📋 Kanban Board</span>
               </div>
             </div>
           </div>
