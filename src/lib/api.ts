@@ -11,6 +11,23 @@ export interface Task {
   completedAt?: string;
 }
 
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Project {
+  id: number;
+  name: string;
+  description?: string;
+  status: 'active' | 'completed' | 'on-hold';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   tasks?: T;
@@ -77,18 +94,19 @@ class ApiService {
   }
 
   // User endpoints (if available)
-  async getUsers(): Promise<any[]> {
-    return this.request<any[]>('/users');
+  async getUsers(): Promise<User[]> {
+    return this.request<User[]>('/users');
   }
 
-  async getUser(id: number): Promise<any> {
-    return this.request<any>(`/users/${id}`);
+  async getUser(id: number): Promise<User> {
+    return this.request<User>(`/users/${id}`);
   }
 
   // Projects endpoints (if available)
-  async getProjects(): Promise<any[]> {
-    return this.request<any[]>('/projects');
+  async getProjects(): Promise<Project[]> {
+    return this.request<Project[]>('/projects');
   }
 }
 
-export default new ApiService();
+const apiService = new ApiService();
+export default apiService;

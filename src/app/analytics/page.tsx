@@ -3,16 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-interface Task {
-  id: number;
-  title: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate?: string;
-  createdAt?: string;
-  completedAt?: string;
-}
-
+// Remove unused Task interface since it's not used in this component
 interface Analytics {
   totalTasks: number;
   completionRate: number;
@@ -261,7 +252,7 @@ export default function AnalyticsPage() {
               <div className="text-2xl mb-2">🎯</div>
               <h4 className="font-semibold text-gray-900 mb-2">Goal Achievement</h4>
               <p className="text-sm text-gray-600">
-                You're completing {analytics.completionRate}% of your tasks. 
+                You&apos;re completing {analytics.completionRate}% of your tasks. 
                 {analytics.completionRate >= 80 ? ' Excellent work!' : 
                  analytics.completionRate >= 60 ? ' Good progress!' : 
                  ' Room for improvement!'}
