@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface Task {
   id: number;
@@ -12,195 +11,199 @@ interface Task {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
   createdAt?: string;
-  completedAt?: string;
 }
 
-interface Stats {
-  total: number;
-  completed: number;
-  inProgress: number;
-  pending: number;
-}
-
-export default function Dashboard() {
+export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [apiInfo, setApiInfo] = useState<string>('');
-  const [stats, setStats] = useState<Stats>({
-    total: 0,
-    completed: 0,
-    inProgress: 0,
-    pending: 0
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [newTask, setNewTask] = useState<{
+    title: string;
+    description: string;
+    priority: Task['priority'];
+    status: Task['status'];
+    dueDate: string;
+  }>({
+    title: '',
+    description: '',
+    priority: 'medium',
+    status: 'pending',
+    dueDate: ''
   });
-  const textStyle = { color: '#111827' };
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const addTaskRef = useRef<HTMLInputElement>(null);
+
+  const columns = [
+    { id: 'pending', title: 'To Do', color: 'bg-gray-100' },
+    { id: 'in-progress', title: 'In Progress', color: 'bg-blue-100' },
+    { id: 'completed', title: 'Completed', color: 'bg-green-100' }
+  ];
 
   useEffect(() => {
-    const fetchTasks = async () => {
+    // Try to fetch from API, fall back to mock data
+    const loadTasks = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        
-        // First, let's check what endpoints are available
-        console.log('Checking API root...');
-        const rootResponse = await fetch('https://sd-6310-2025-summer-express-app.onrender.com/');
-        const rootData = await rootResponse.text();
-        console.log('Root response:', rootData);
-        
-        // Try different possible endpoints
-        const possibleEndpoints = [
-          '/tasks',
-          '/api/tasks', 
-          '/task',
-          '/todos',
-          '/items'
-        ];
-        
-        let fetchedTasks: Task[] = [];
-        let workingEndpoint = '';
-        
-        for (const endpoint of possibleEndpoints) {
-          try {
-            console.log(`Trying endpoint: ${endpoint}`);
-            const response = await fetch(`https://sd-6310-2025-summer-express-app.onrender.com${endpoint}`);
-            
-            if (response.ok) {
-              const data = await response.json();
-              console.log(`Success with ${endpoint}:`, data);
-              
-              // Try to map the data to our Task format
-              if (Array.isArray(data)) {
-                fetchedTasks = data.map((item: any, index: number) => ({
-                  id: item.id || index + 1,
-                  title: item.title || item.name || item.task || `Task ${index + 1}`,
-                  description: item.description || item.desc || '',
-                  status: mapStatus(item.status || item.state || 'pending'),
-                  priority: mapPriority(item.priority || 'medium'),
-                  dueDate: item.dueDate || item.due || item.deadline,
-                  createdAt: item.createdAt || item.created || new Date().toISOString().split('T')[0],
-                }));
-                workingEndpoint = endpoint;
-                break;
-              } else if (data.tasks || data.data) {
-                // Handle nested response structure
-                const items = data.tasks || data.data;
-                fetchedTasks = items.map((item: any, index: number) => ({
-                  id: item.id || index + 1,
-                  title: item.title || item.name || item.task || `Task ${index + 1}`,
-                  description: item.description || item.desc || '',
-                  status: mapStatus(item.status || item.state || 'pending'),
-                  priority: mapPriority(item.priority || 'medium'),
-                  dueDate: item.dueDate || item.due || item.deadline,
-                  createdAt: item.createdAt || item.created || new Date().toISOString().split('T')[0],
-                }));
-                workingEndpoint = endpoint;
-                break;
-              }
-            }
-          } catch (endpointError) {
-            console.log(`Failed ${endpoint}:`, endpointError);
-          }
+        // Attempt API fetch (will fail gracefully)
+        const response = await fetch('https://sd-6310-2025-summer-express-app.onrender.com/tasks');
+        if (response.ok) {
+          const apiTasks = await response.json();
+          // Convert API data to our format if successful
+          setTasks(apiTasks);
+          return;
         }
-        
-        if (fetchedTasks.length > 0) {
-          setTasks(fetchedTasks);
-          setApiInfo(`✅ Connected to API endpoint: ${workingEndpoint}`);
-          
-          // Calculate stats from API data
-          const newStats: Stats = {
-            total: fetchedTasks.length,
-            completed: fetchedTasks.filter(task => task.status === 'completed').length,
-            inProgress: fetchedTasks.filter(task => task.status === 'in-progress').length,
-            pending: fetchedTasks.filter(task => task.status === 'pending').length
-          };
-          setStats(newStats);
-        } else {
-          throw new Error('No working endpoints found');
-        }
-        
-      } catch (apiError) {
-        console.warn('All API endpoints failed, using mock data:', apiError);
-        setError('API unavailable, showing sample data');
-        setApiInfo('❌ API connection failed - using sample data');
-        
-        // Fallback to mock data
-        const mockTasks: Task[] = [
-          { id: 1, title: 'Design new homepage', status: 'in-progress', priority: 'high', dueDate: '2025-05-30' },
-          { id: 2, title: 'Fix login bug', status: 'pending', priority: 'urgent', dueDate: '2025-05-26' },
-          { id: 3, title: 'Update documentation', status: 'completed', priority: 'medium', dueDate: '2025-05-25' },
-          { id: 4, title: 'Code review for API', status: 'pending', priority: 'high', dueDate: '2025-05-28' }
-        ];
-        
-        setTasks(mockTasks);
-        
-        const newStats: Stats = {
-          total: mockTasks.length,
-          completed: mockTasks.filter(task => task.status === 'completed').length,
-          inProgress: mockTasks.filter(task => task.status === 'in-progress').length,
-          pending: mockTasks.filter(task => task.status === 'pending').length
-        };
-        setStats(newStats);
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.log('API unavailable, using mock data');
       }
+      
+      // Mock data fallback
+      const mockTasks: Task[] = [
+        { 
+          id: 1, 
+          title: 'Design new homepage', 
+          description: 'Create wireframes and mockups for the new homepage design',
+          status: 'in-progress', 
+          priority: 'high', 
+          dueDate: '2025-05-30',
+          createdAt: '2025-05-20'
+        },
+        { 
+          id: 2, 
+          title: 'Fix login bug', 
+          description: 'Investigate and fix the authentication issue reported by users',
+          status: 'pending', 
+          priority: 'urgent', 
+          dueDate: '2025-05-26',
+          createdAt: '2025-05-21'
+        },
+        { 
+          id: 3, 
+          title: 'Update documentation', 
+          description: 'Update API documentation with new endpoints',
+          status: 'completed', 
+          priority: 'medium', 
+          dueDate: '2025-05-25',
+          createdAt: '2025-05-19'
+        },
+        { 
+          id: 4, 
+          title: 'Code review for API', 
+          description: 'Review pull request for new API features',
+          status: 'pending', 
+          priority: 'high', 
+          dueDate: '2025-05-28',
+          createdAt: '2025-05-22'
+        }
+      ];
+      setTasks(mockTasks);
     };
 
-    fetchTasks();
+    loadTasks();
   }, []);
 
-  // Helper functions to map API data to our format
-  const mapStatus = (status: string): 'pending' | 'in-progress' | 'completed' => {
-    const statusLower = status.toLowerCase();
-    if (statusLower.includes('complete') || statusLower.includes('done') || statusLower === 'finished') {
-      return 'completed';
+  useEffect(() => {
+    if (showAddTask && addTaskRef.current) {
+      addTaskRef.current.focus();
     }
-    if (statusLower.includes('progress') || statusLower.includes('active') || statusLower === 'working') {
-      return 'in-progress';
-    }
-    return 'pending';
+  }, [showAddTask]);
+
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTask.title.trim()) return;
+
+    const taskData: Task = {
+      ...newTask,
+      id: Date.now(),
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+
+    setTasks(prev => [...prev, taskData]);
+    
+    // Reset form
+    setNewTask({
+      title: '',
+      description: '',
+      priority: 'medium',
+      status: 'pending',
+      dueDate: ''
+    });
+    setShowAddTask(false);
   };
 
-  const mapPriority = (priority: string): 'low' | 'medium' | 'high' | 'urgent' => {
-    const priorityLower = priority.toLowerCase();
-    if (priorityLower.includes('urgent') || priorityLower.includes('critical')) return 'urgent';
-    if (priorityLower.includes('high') || priorityLower.includes('important')) return 'high';
-    if (priorityLower.includes('low')) return 'low';
-    return 'medium';
+  const handleDragStart = (e: React.DragEvent, task: Task) => {
+    setDraggedTask(task);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetStatus: string) => {
+    e.preventDefault();
+    
+    if (!draggedTask || draggedTask.status === targetStatus) {
+      setDraggedTask(null);
+      return;
+    }
+
+    const updatedTask = { ...draggedTask, status: targetStatus as Task['status'] };
+    
+    setTasks(prev => 
+      prev.map(task => 
+        task.id === draggedTask.id 
+          ? updatedTask 
+          : task
+      )
+    );
+
+    setDraggedTask(null);
+  };
+
+  const handleDeleteTask = (taskId: number) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    setTasks(prev => prev.filter(task => task.id !== taskId));
+  };
+
+  const getTasksByStatus = (status: string): Task[] => {
+    return tasks.filter(task => task.status === status);
   };
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'urgent': return 'border-l-red-500 bg-red-50';
+      case 'high': return 'border-l-orange-500 bg-orange-50';
+      case 'medium': return 'border-l-yellow-500 bg-yellow-50';
+      case 'low': return 'border-l-green-500 bg-green-50';
+      default: return 'border-l-gray-500 bg-gray-50';
     }
   };
 
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'in-progress': return 'text-blue-600 bg-blue-100';
-      case 'pending': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+  const getPriorityBadgeColor = (priority: string): string => {
+    switch (priority) {
+      case 'urgent': return 'text-red-700 bg-red-100';
+      case 'high': return 'text-orange-700 bg-orange-100';
+      case 'medium': return 'text-yellow-700 bg-yellow-100';
+      case 'low': return 'text-green-700 bg-green-100';
+      default: return 'text-gray-700 bg-gray-100';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" style={textStyle}>
-      {/* Simple Navigation */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Navigation */}
       <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-gray-900">TaskFlow</span>
+              <Link href="/" className="flex items-center space-x-3">
+                <span className="text-xl font-bold text-gray-900">TaskFlow</span>
+              </Link>
             </div>
             <div className="flex items-center space-x-8">
               <Link href="/" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
                 Dashboard
               </Link>
-              <Link href="/tasks" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+              <Link href="/tasks" className="text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
                 Tasks
               </Link>
               <Link href="/analytics" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
@@ -211,172 +214,181 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to TaskFlow
-          </h1>
-          <p className="text-gray-600">
-            Manage your tasks efficiently with our intuitive kanban board system.
-          </p>
-          {(error || apiInfo) && (
-            <div className={`mt-2 p-3 border rounded-md text-sm ${
-              error 
-                ? 'bg-yellow-100 border-yellow-400 text-yellow-700' 
-                : 'bg-green-100 border-green-400 text-green-700'
-            }`}>
-              {error || apiInfo}
-            </div>
-          )}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Task Management
+            </h1>
+            <p className="text-gray-600">
+              Drag and drop tasks between columns to update their status.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowAddTask(true)}
+            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <svg className="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Task
+          </button>
         </div>
 
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-8 mb-8 text-white">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="md:w-1/2 mb-6 md:mb-0">
-              <h2 className="text-2xl font-bold mb-4">
-                Organize Your Work Like Never Before
-              </h2>
-              <p className="text-indigo-100 mb-6">
-                Create, manage, and track your tasks with our powerful kanban board. 
-                Stay productive and never miss a deadline.
-              </p>
-              <Link
-                href="/tasks"
-                className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                View All Tasks
-                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-            <div className="md:w-1/2 flex justify-center">
-              <div className="w-64 h-48 bg-white bg-opacity-20 rounded-lg flex items-center justify-center relative">
-                <Image
-                  src="/next.svg"
-                  alt="TaskFlow Kanban Board"
-                  width={100}
-                  height={40}
-                  className="opacity-75"
-                />
-                <span className="absolute bottom-4 text-indigo-100 text-sm font-semibold">📋 Kanban Board</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">In Progress</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.inProgress}</p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-              </div>
-              <div className="p-3 bg-yellow-100 rounded-full">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Tasks */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Tasks</h3>
-              <Link href="/tasks" className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                View All
-              </Link>
-            </div>
-          </div>
-          
-          <div className="p-6">
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {tasks.slice(0, 3).map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{task.title}</h4>
-                      {task.dueDate && (
-                        <p className="text-sm text-gray-500 mt-1">Due: {task.dueDate}</p>
-                      )}
+        {/* Add Task Modal */}
+        {showAddTask && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Task</h3>
+              <form onSubmit={handleAddTask}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Title
+                    </label>
+                    <input
+                      ref={addTaskRef}
+                      type="text"
+                      value={newTask.title}
+                      onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={newTask.description}
+                      onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Priority
+                      </label>
+                      <select
+                        value={newTask.priority}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, priority: e.target.value as Task['priority'] }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Due Date
+                      </label>
+                      <input
+                        type="date"
+                        value={newTask.dueDate}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, dueDate: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddTask(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                  >
+                    Add Task
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Kanban Board */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {columns.map((column) => (
+            <div
+              key={column.id}
+              className={`${column.color} rounded-lg p-4 min-h-96`}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, column.id)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-900">
+                  {column.title}
+                </h3>
+                <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
+                  {getTasksByStatus(column.id).length}
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {getTasksByStatus(column.id).map((task) => (
+                  <div
+                    key={task.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, task)}
+                    className={`bg-white rounded-lg p-4 shadow-sm border-l-4 cursor-move hover:shadow-md transition-shadow ${getPriorityColor(task.priority)}`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-gray-900 flex-1">
+                        {task.title}
+                      </h4>
+                      <button
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="text-gray-400 hover:text-red-600 transition-colors ml-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {task.description && (
+                      <p className="text-sm text-gray-600 mb-3">
+                        {task.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityBadgeColor(task.priority)}`}>
                         {task.priority}
                       </span>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                        {task.status}
-                      </span>
+
+                      {task.dueDate && (
+                        <span className="text-xs text-gray-500">
+                          Due: {task.dueDate}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-8">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p>&copy; 2025 TaskFlow. Built with Next.js and Tailwind CSS.</p>
-          </div>
+                {getTasksByStatus(column.id).length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <svg className="mx-auto w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <p className="text-sm">No tasks yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
