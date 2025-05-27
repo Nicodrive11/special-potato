@@ -17,11 +17,17 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   // Removed unused loading and setLoading variables
   const [showAddTask, setShowAddTask] = useState(false);
-  const [newTask, setNewTask] = useState({
+  const [newTask, setNewTask] = useState<{
+    title: string;
+    description: string;
+    priority: Task['priority'];
+    status: Task['status'];
+    dueDate: string;
+  }>({
     title: '',
     description: '',
-    priority: 'medium' as const,
-    status: 'pending' as const,
+    priority: 'medium',
+    status: 'pending',
     dueDate: ''
   });
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
