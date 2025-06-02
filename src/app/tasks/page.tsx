@@ -51,7 +51,8 @@ export default function TasksPage() {
           return;
         }
       } catch (error) {
-        console.log('API unavailable, using mock data');
+        // Fixed: Removed the return statement and just log the error
+        console.log('API unavailable, using mock data', error);
       }
       
       // Mock data fallback

@@ -10,6 +10,26 @@ interface Task {
   completedAt?: string;
 }
 
+// Define interfaces for API response data
+interface ApiTaskItem {
+  id?: number;
+  title?: string;
+  name?: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  dueDate?: string;
+  due?: string;
+  createdAt?: string;
+  [key: string]: unknown; // For any additional properties
+}
+
+interface ApiResponse {
+  tasks?: ApiTaskItem[];
+  data?: ApiTaskItem[];
+  [key: string]: unknown; // For any additional properties
+}
+
 const API_BASE_URL = 'https://sd-6310-2025-summer-express-app.onrender.com';
 
 // Helper functions to map API data to our format
@@ -32,9 +52,10 @@ const mapPriority = (priority: string): 'low' | 'medium' | 'high' | 'urgent' => 
   return 'medium';
 };
 
-const convertApiDataToTasks = (data: any): Task[] => {
+const convertApiDataToTasks = (data: ApiTaskItem[] | ApiResponse): Task[] => {
+  // Handle direct array of tasks
   if (Array.isArray(data)) {
-    return data.map((item: any, index: number) => ({
+    return data.map((item: ApiTaskItem, index: number) => ({
       id: item.id || index + 1,
       title: item.title || item.name || `API Task ${index + 1}`,
       description: item.description || '',
@@ -43,20 +64,33 @@ const convertApiDataToTasks = (data: any): Task[] => {
       dueDate: item.dueDate || item.due,
       createdAt: item.createdAt || new Date().toISOString().split('T')[0],
     }));
-  } else if (data.tasks || data.data) {
+  } 
+  
+  // Handle response object with tasks or data property
+  if (typeof data === 'object' && data !== null) {
     const items = data.tasks || data.data;
-    return items.map((item: any, index: number) => ({
-      id: item.id || index + 1,
-      title: item.title || item.name || `API Task ${index + 1}`,
-      description: item.description || '',
-      status: mapStatus(item.status || 'pending'),
-      priority: mapPriority(item.priority || 'medium'),
-      dueDate: item.dueDate || item.due,
-      createdAt: item.createdAt || new Date().toISOString().split('T')[0],
-    }));
+    if (Array.isArray(items)) {
+      return items.map((item: ApiTaskItem, index: number) => ({
+        id: item.id || index + 1,
+        title: item.title || item.name || `API Task ${index + 1}`,
+        description: item.description || '',
+        status: mapStatus(item.status || 'pending'),
+        priority: mapPriority(item.priority || 'medium'),
+        dueDate: item.dueDate || item.due,
+        createdAt: item.createdAt || new Date().toISOString().split('T')[0],
+      }));
+    }
   }
+  
   return [];
 };
+
+// Define interface for fetch result
+interface FetchResult {
+  endpoint: string;
+  response: Response | null;
+  success: boolean;
+}
 
 // Improved fetchTasks using Promise.all for concurrent requests
 export const fetchTasks = async (): Promise<{ tasks: Task[]; apiStatus: string }> => {
@@ -76,12 +110,12 @@ export const fetchTasks = async (): Promise<{ tasks: Task[]; apiStatus: string }
           endpoint,
           response,
           success: response.ok
-        }))
+        } as FetchResult))
         .catch(() => ({
           endpoint,
           response: null,
           success: false
-        }))
+        } as FetchResult))
     );
 
     // Execute all requests concurrently
@@ -91,7 +125,7 @@ export const fetchTasks = async (): Promise<{ tasks: Task[]; apiStatus: string }
     for (const result of results) {
       if (result.success && result.response) {
         try {
-          const data = await result.response.json();
+          const data: ApiTaskItem[] | ApiResponse = await result.response.json();
           const tasks = convertApiDataToTasks(data);
           
           if (tasks.length > 0) {
