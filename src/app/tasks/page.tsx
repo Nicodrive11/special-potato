@@ -2,32 +2,25 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-
-interface Task {
-  id: number;
-  title: string;
-  description?: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate?: string;
-  createdAt?: string;
-}
+import apiService, { Task } from '@/utils/api';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [apiStatus, setApiStatus] = useState<string>('');
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState<{
     title: string;
     description: string;
     priority: Task['priority'];
-    status: Task['status'];
-    dueDate: string;
+    task_status: Task['task_status'];
+    due_date: string;
   }>({
     title: '',
     description: '',
     priority: 'medium',
-    status: 'pending',
-    dueDate: ''
+    task_status: 'pending',
+    due_date: ''
   });
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const addTaskRef = useRef<HTMLInputElement>(null);
@@ -39,64 +32,6 @@ export default function TasksPage() {
   ];
 
   useEffect(() => {
-    // Try to fetch from API, fall back to mock data
-    const loadTasks = async () => {
-      try {
-        // Attempt API fetch (will fail gracefully)
-        const response = await fetch('https://sd-6310-2025-summer-express-app.onrender.com/tasks');
-        if (response.ok) {
-          const apiTasks = await response.json();
-          // Convert API data to our format if successful
-          setTasks(apiTasks);
-          return;
-        }
-      } catch (error) {
-        // Fixed: Removed the return statement and just log the error
-        console.log('API unavailable, using mock data', error);
-      }
-      
-      // Mock data fallback
-      const mockTasks: Task[] = [
-        { 
-          id: 1, 
-          title: 'Design new homepage', 
-          description: 'Create wireframes and mockups for the new homepage design',
-          status: 'in-progress', 
-          priority: 'high', 
-          dueDate: '2025-05-30',
-          createdAt: '2025-05-20'
-        },
-        { 
-          id: 2, 
-          title: 'Fix login bug', 
-          description: 'Investigate and fix the authentication issue reported by users',
-          status: 'pending', 
-          priority: 'urgent', 
-          dueDate: '2025-05-26',
-          createdAt: '2025-05-21'
-        },
-        { 
-          id: 3, 
-          title: 'Update documentation', 
-          description: 'Update API documentation with new endpoints',
-          status: 'completed', 
-          priority: 'medium', 
-          dueDate: '2025-05-25',
-          createdAt: '2025-05-19'
-        },
-        { 
-          id: 4, 
-          title: 'Code review for API', 
-          description: 'Review pull request for new API features',
-          status: 'pending', 
-          priority: 'high', 
-          dueDate: '2025-05-28',
-          createdAt: '2025-05-22'
-        }
-      ];
-      setTasks(mockTasks);
-    };
-
     loadTasks();
   }, []);
 
@@ -106,25 +41,98 @@ export default function TasksPage() {
     }
   }, [showAddTask]);
 
-  const handleAddTask = (e: React.FormEvent) => {
+  const loadTasks = async () => {
+    setLoading(true);
+    try {
+      // Try to fetch from new API first
+      const response = await apiService.getTasks();
+      setTasks(response.tasks || []);
+      setApiStatus(`✅ Connected to TaskFlow API (${response.tasks?.length || 0} tasks loaded)`);
+    } catch (error) {
+      console.log('API unavailable, using mock data', error);
+      setApiStatus('⚠️ TaskFlow API unavailable - showing sample data');
+      
+      // Mock data fallback
+      const mockTasks: Task[] = [
+        { 
+          id: 1, 
+          title: 'Design new homepage', 
+          description: 'Create wireframes and mockups for the new homepage design',
+          task_status: 'in-progress', 
+          priority: 'high', 
+          due_date: '2025-06-15',
+          created_date: '2025-06-01'
+        },
+        { 
+          id: 2, 
+          title: 'Fix login bug', 
+          description: 'Investigate and fix the authentication issue reported by users',
+          task_status: 'pending', 
+          priority: 'urgent', 
+          due_date: '2025-06-10',
+          created_date: '2025-06-02'
+        },
+        { 
+          id: 3, 
+          title: 'Update documentation', 
+          description: 'Update API documentation with new endpoints',
+          task_status: 'completed', 
+          priority: 'medium', 
+          due_date: '2025-06-08',
+          created_date: '2025-05-30'
+        },
+        { 
+          id: 4, 
+          title: 'Code review for API', 
+          description: 'Review pull request for new API features',
+          task_status: 'pending', 
+          priority: 'high', 
+          due_date: '2025-06-12',
+          created_date: '2025-06-03'
+        }
+      ];
+      setTasks(mockTasks);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTask.title.trim()) return;
 
-    const taskData: Task = {
-      ...newTask,
-      id: Date.now(),
-      createdAt: new Date().toISOString().split('T')[0]
-    };
-
-    setTasks(prev => [...prev, taskData]);
+    try {
+      // Try to create task via API
+      const response = await apiService.createTask({
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority,
+        task_status: newTask.task_status,
+        due_date: newTask.due_date || undefined
+      });
+      
+      setTasks(prev => [...prev, response.task]);
+      setApiStatus(`✅ Task created successfully`);
+    } catch (error) {
+      console.error('Failed to create task via API, adding locally:', error);
+      
+      // Fallback to local creation
+      const taskData: Task = {
+        ...newTask,
+        id: Date.now(),
+        created_date: new Date().toISOString().split('T')[0]
+      };
+      setTasks(prev => [...prev, taskData]);
+      setApiStatus('⚠️ Task created locally (API unavailable)');
+    }
     
     // Reset form
     setNewTask({
       title: '',
       description: '',
       priority: 'medium',
-      status: 'pending',
-      dueDate: ''
+      task_status: 'pending',
+      due_date: ''
     });
     setShowAddTask(false);
   };
@@ -139,34 +147,93 @@ export default function TasksPage() {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, targetStatus: string) => {
+  const handleDrop = async (e: React.DragEvent, targetStatus: string) => {
     e.preventDefault();
     
-    if (!draggedTask || draggedTask.status === targetStatus) {
+    if (!draggedTask || draggedTask.task_status === targetStatus) {
       setDraggedTask(null);
       return;
     }
 
-    const updatedTask = { ...draggedTask, status: targetStatus as Task['status'] };
-    
-    setTasks(prev => 
-      prev.map(task => 
-        task.id === draggedTask.id 
-          ? updatedTask 
-          : task
-      )
-    );
+    try {
+      // First, let's try with just the status change
+      console.log('Attempting to update task:', draggedTask.id, 'to status:', targetStatus);
+      
+      const updateData = {
+        task_status: targetStatus as Task['task_status']
+      };
+
+      console.log('Sending update data:', updateData);
+      
+      const response = await apiService.updateTask(draggedTask.id, updateData);
+      
+      setTasks(prev => 
+        prev.map(task => 
+          task.id === draggedTask.id ? response.task : task
+        )
+      );
+      setApiStatus(`✅ Task "${draggedTask.title}" moved to ${targetStatus.replace('-', ' ')}`);
+    } catch (error) {
+      console.error('API update failed:', error);
+      
+      // Try again with full task data as fallback
+      try {
+        console.log('Retrying with full task data...');
+        const fullUpdateData = {
+          title: draggedTask.title,
+          description: draggedTask.description || '',
+          task_status: targetStatus as Task['task_status'],
+          priority: draggedTask.priority,
+          due_date: draggedTask.due_date,
+          assigned_to: draggedTask.assigned_to,
+          created_by: draggedTask.created_by
+        };
+        
+        const response = await apiService.updateTask(draggedTask.id, fullUpdateData);
+        
+        setTasks(prev => 
+          prev.map(task => 
+            task.id === draggedTask.id ? response.task : task
+          )
+        );
+        setApiStatus(`✅ Task "${draggedTask.title}" moved to ${targetStatus.replace('-', ' ')} (full update)`);
+      } catch (fullError) {
+        console.error('Full update also failed:', fullError);
+        
+        // Final fallback to local update
+        const updatedTask = { ...draggedTask, task_status: targetStatus as Task['task_status'] };
+        
+        setTasks(prev => 
+          prev.map(task => 
+            task.id === draggedTask.id ? updatedTask : task
+          )
+        );
+        setApiStatus(`⚠️ Task updated locally (API: ${error instanceof Error ? error.message : 'Unknown error'})`);
+      }
+    }
 
     setDraggedTask(null);
   };
 
-  const handleDeleteTask = (taskId: number) => {
+  const handleDeleteTask = async (taskId: number) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
-    setTasks(prev => prev.filter(task => task.id !== taskId));
+    
+    try {
+      // Try to delete via API
+      await apiService.deleteTask(taskId);
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+      setApiStatus(`✅ Task deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete task via API, removing locally:', error);
+      
+      // Fallback to local deletion
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+      setApiStatus('⚠️ Task removed locally (API unavailable)');
+    }
   };
 
   const getTasksByStatus = (status: string): Task[] => {
-    return tasks.filter(task => task.status === status);
+    return tasks.filter(task => task.task_status === status);
   };
 
   const getPriorityColor = (priority: string): string => {
@@ -187,6 +254,11 @@ export default function TasksPage() {
       case 'low': return 'text-green-700 bg-green-100';
       default: return 'text-gray-700 bg-gray-100';
     }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -225,16 +297,34 @@ export default function TasksPage() {
             <p className="text-gray-600">
               Drag and drop tasks between columns to update their status.
             </p>
+            {apiStatus && (
+              <div className={`mt-2 p-2 rounded text-sm ${
+                apiStatus.includes('✅') 
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-yellow-100 text-yellow-700'
+              }`}>
+                {apiStatus}
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => setShowAddTask(true)}
-            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            <svg className="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add Task
-          </button>
+          <div className="flex gap-3 mt-4 sm:mt-0">
+            <button
+              onClick={loadTasks}
+              disabled={loading}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+            >
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button
+              onClick={() => setShowAddTask(true)}
+              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <svg className="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Task
+            </button>
+          </div>
         </div>
 
         {/* Add Task Modal */}
@@ -290,8 +380,8 @@ export default function TasksPage() {
                       </label>
                       <input
                         type="date"
-                        value={newTask.dueDate}
-                        onChange={(e) => setNewTask(prev => ({ ...prev, dueDate: e.target.value }))}
+                        value={newTask.due_date}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, due_date: e.target.value }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
@@ -317,78 +407,87 @@ export default function TasksPage() {
           </div>
         )}
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          </div>
+        )}
+
         {/* Kanban Board */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {columns.map((column) => (
-            <div
-              key={column.id}
-              className={`${column.color} rounded-lg p-4 min-h-96`}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, column.id)}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">
-                  {column.title}
-                </h3>
-                <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
-                  {getTasksByStatus(column.id).length}
-                </span>
-              </div>
+        {!loading && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {columns.map((column) => (
+              <div
+                key={column.id}
+                className={`${column.color} rounded-lg p-4 min-h-96`}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, column.id)}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-gray-900">
+                    {column.title}
+                  </h3>
+                  <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-full">
+                    {getTasksByStatus(column.id).length}
+                  </span>
+                </div>
 
-              <div className="space-y-3">
-                {getTasksByStatus(column.id).map((task) => (
-                  <div
-                    key={task.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, task)}
-                    className={`bg-white rounded-lg p-4 shadow-sm border-l-4 cursor-move hover:shadow-md transition-shadow ${getPriorityColor(task.priority)}`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-gray-900 flex-1">
-                        {task.title}
-                      </h4>
-                      <button
-                        onClick={() => handleDeleteTask(task.id)}
-                        className="text-gray-400 hover:text-red-600 transition-colors ml-2"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
+                <div className="space-y-3">
+                  {getTasksByStatus(column.id).map((task) => (
+                    <div
+                      key={task.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, task)}
+                      className={`bg-white rounded-lg p-4 shadow-sm border-l-4 cursor-move hover:shadow-md transition-shadow ${getPriorityColor(task.priority)}`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-gray-900 flex-1">
+                          {task.title}
+                        </h4>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          className="text-gray-400 hover:text-red-600 transition-colors ml-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
 
-                    {task.description && (
-                      <p className="text-sm text-gray-600 mb-3">
-                        {task.description}
-                      </p>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityBadgeColor(task.priority)}`}>
-                        {task.priority}
-                      </span>
-
-                      {task.dueDate && (
-                        <span className="text-xs text-gray-500">
-                          Due: {task.dueDate}
-                        </span>
+                      {task.description && (
+                        <p className="text-sm text-gray-600 mb-3">
+                          {task.description}
+                        </p>
                       )}
-                    </div>
-                  </div>
-                ))}
 
-                {getTasksByStatus(column.id).length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <svg className="mx-auto w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    <p className="text-sm">No tasks yet</p>
-                  </div>
-                )}
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityBadgeColor(task.priority)}`}>
+                          {task.priority}
+                        </span>
+
+                        {task.due_date && (
+                          <span className="text-xs text-gray-500">
+                            Due: {formatDate(task.due_date)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {getTasksByStatus(column.id).length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <svg className="mx-auto w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      <p className="text-sm">No tasks yet</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
