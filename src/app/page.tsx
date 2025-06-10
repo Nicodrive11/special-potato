@@ -4,7 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { fetchTasks, type Task } from '@/utils/api';
+import apiService from '@/utils/api';
 import { getPriorityColor, getStatusColor } from '@/utils/ui';
+import StatsCards from '@/components/StatsCards';
 
 interface Stats {
   total: number;
@@ -99,104 +101,22 @@ function HeroSection() {
   );
 }
 
-// Component: Individual Stat Card (improvement #3 - componentized)
-function StatCard({ title, value, color, icon }: {
-  title: string;
-  value: number;
-  color: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className={`text-2xl font-bold text-${color}-600`}>{value}</p>
-        </div>
-        <div className={`p-3 bg-${color}-100 rounded-full`}>
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Component: Stats Cards (improvement #3 - componentized)
-function StatsCards({ stats }: { stats: Stats }) {
-  const statItems = [
-    {
-      title: 'Total Tasks',
-      value: stats.total,
-      color: 'blue',
-      icon: (
-        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      )
-    },
-    {
-      title: 'Completed',
-      value: stats.completed,
-      color: 'green',
-      icon: (
-        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      )
-    },
-    {
-      title: 'In Progress',
-      value: stats.inProgress,
-      color: 'blue',
-      icon: (
-        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
-    },
-    {
-      title: 'Pending',
-      value: stats.pending,
-      color: 'yellow',
-      icon: (
-        <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
-    }
-  ];
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {statItems.map((item) => (
-        <StatCard
-          key={item.title}
-          title={item.title}
-          value={item.value}
-          color={item.color}
-          icon={item.icon}
-        />
-      ))}
-    </div>
-  );
-}
-
 // Component: Task Item (improvement #3 - componentized)
 function TaskItem({ task }: { task: Task }) {
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
       <div className="flex-1">
         <h4 className="font-medium text-gray-900">{task.title}</h4>
-        {task.dueDate && (
-          <p className="text-sm text-gray-500 mt-1">Due: {task.dueDate}</p>
+        {task.due_date && (
+          <p className="text-sm text-gray-500 mt-1">Due: {new Date(task.due_date).toLocaleDateString()}</p>
         )}
       </div>
       <div className="flex items-center space-x-3">
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
           {task.priority}
         </span>
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-          {task.status}
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.task_status)}`}>
+          {task.task_status.replace('-', ' ')}
         </span>
       </div>
     </div>
@@ -233,32 +153,83 @@ function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
   );
 }
 
+// API Connection Status Component
+function ApiConnectionStatus({ status }: { status: string }) {
+  const isConnected = status.includes('✅');
+  
+  return (
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">API Connection Status</h3>
+          <p className="text-sm text-gray-600 mt-1">{status}</p>
+        </div>
+        <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+      </div>
+    </div>
+  );
+}
+
 // Main Dashboard Component
 export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [apiStatus, setApiStatus] = useState<string>('');
+  const [apiStatus, setApiStatus] = useState<string>('Connecting to API...');
 
   // Improvement #4: Use useMemo instead of useEffect for derived state
   const stats: Stats = useMemo(() => ({
     total: tasks.length,
-    completed: tasks.filter(task => task.status === 'completed').length,
-    inProgress: tasks.filter(task => task.status === 'in-progress').length,
-    pending: tasks.filter(task => task.status === 'pending').length
+    completed: tasks.filter(task => task.task_status === 'completed').length,
+    inProgress: tasks.filter(task => task.task_status === 'in-progress').length,
+    pending: tasks.filter(task => task.task_status === 'pending').length
   }), [tasks]);
 
   useEffect(() => {
-    // Improvement #2: Moved fetchTasks function to utils/api.ts
+    // Enhanced task loading with proper API integration
     const loadTasks = async () => {
       try {
         setLoading(true);
-        // Improvement #1: fetchTasks now uses Promise.all for concurrent requests
-        const { tasks: fetchedTasks, apiStatus: status } = await fetchTasks();
-        setTasks(fetchedTasks);
-        setApiStatus(status);
+        
+        // Try the new API service first
+        const response = await apiService.getTasks();
+        setTasks(response.tasks || []);
+        setApiStatus(`✅ Connected to TaskFlow API (${response.tasks?.length || 0} tasks loaded)`);
+        
       } catch (error) {
-        console.error('Failed to load tasks:', error);
-        setApiStatus('❌ Failed to load tasks');
+        console.error('New API failed, trying legacy fetchTasks:', error);
+        
+        try {
+          // Fallback to legacy fetchTasks function
+          const { tasks: fetchedTasks, apiStatus: status } = await fetchTasks();
+          setTasks(fetchedTasks);
+          setApiStatus(status);
+        } catch (legacyError) {
+          console.error('All API methods failed:', legacyError);
+          setApiStatus('❌ Failed to connect to API - using sample data');
+          
+          // Final fallback to sample data
+          const sampleTasks: Task[] = [
+            { 
+              id: 1, 
+              title: 'Connect to API', 
+              description: 'Establish connection to backend API',
+              task_status: 'in-progress', 
+              priority: 'high', 
+              due_date: '2025-06-15',
+              created_date: '2025-06-01'
+            },
+            { 
+              id: 2, 
+              title: 'Create Components', 
+              description: 'Build React components for tasks',
+              task_status: 'pending', 
+              priority: 'medium', 
+              due_date: '2025-06-20',
+              created_date: '2025-06-02'
+            }
+          ];
+          setTasks(sampleTasks);
+        }
       } finally {
         setLoading(false);
       }
@@ -267,6 +238,19 @@ export default function Dashboard() {
     loadTasks();
   }, []);
 
+  const refreshData = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.getTasks();
+      setTasks(response.tasks || []);
+      setApiStatus(`✅ Connected to TaskFlow API (${response.tasks?.length || 0} tasks loaded) - Refreshed at ${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      setApiStatus(`❌ Refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <Navigation />
@@ -274,14 +258,28 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to TaskFlow
-          </h1>
-          <p className="text-gray-600">
-            Manage your tasks efficiently with our intuitive kanban board system.
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Welcome to TaskFlow
+              </h1>
+              <p className="text-gray-600">
+                Manage your tasks efficiently with our intuitive kanban board system.
+              </p>
+            </div>
+            <button
+              onClick={refreshData}
+              disabled={loading}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            >
+              {loading ? 'Refreshing...' : 'Refresh Data'}
+            </button>
+          </div>
           <StatusBanner status={apiStatus} />
         </div>
+
+        {/* API Connection Status */}
+        <ApiConnectionStatus status={apiStatus} />
 
         <HeroSection />
         <StatsCards stats={stats} />
