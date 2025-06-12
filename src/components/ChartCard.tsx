@@ -1,12 +1,6 @@
 // src/components/ChartCard.tsx
 'use client';
 
-interface ChartItem {
-  label: string;
-  value: number;
-  color: string;
-}
-
 interface ChartCardProps {
   title: string;
   data: Record<string, number>;

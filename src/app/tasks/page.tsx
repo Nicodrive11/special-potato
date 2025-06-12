@@ -4,13 +4,12 @@ import { useState } from 'react';
 import { Task } from '@/utils/api';
 import Navigation from '@/components/Navigation';
 import KanbanColumn from '@/components/KanbanColumn';
-import TaskFormModal, { TaskFormData } from '@/components/TaskFormModal';
+import TaskFormModal from '@/components/TaskFormModal';
 import Loading from '@/components/Loading';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasks, TaskFormData } from '@/hooks/useTasks';
 
 export default function TasksPage() {
   const {
-    tasks,
     loading,
     apiStatus,
     loadTasks,

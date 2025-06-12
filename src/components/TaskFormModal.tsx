@@ -3,14 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Task } from '@/utils/api';
-
-export interface TaskFormData {
-  title: string;
-  description: string;
-  priority: Task['priority'];
-  task_status: Task['task_status'];
-  due_date: string;
-}
+import { TaskFormData } from '@/hooks/useTasks';
 
 interface TaskFormModalProps {
   isOpen: boolean;
