@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Task } from '@/utils/api';
 import { TaskFormData } from '@/hooks/useTasks';
 
 interface TaskFormModalProps {
