@@ -153,96 +153,98 @@ export default function AnalyticsPage() {
         {!loading && (
           <>
             {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {metricCards.map((metric, index) => (
-            <MetricCard
-              key={index}
-              title={metric.title}
-              value={metric.value}
-              subtitle={metric.subtitle}
-              icon={metric.icon}
-              color={metric.color}
-            />
-          ))}
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {metricCards.map((metric, index) => (
+                <MetricCard
+                  key={index}
+                  title={metric.title}
+                  value={metric.value}
+                  subtitle={metric.subtitle}
+                  icon={metric.icon}
+                  color={metric.color}
+                />
+              ))}
+            </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <ChartCard
-            title="Tasks by Priority"
-            data={analytics.tasksByPriority}
-            total={analytics.totalTasks}
-            getColor={getPriorityColor}
-          />
-
-          <ChartCard
-            title="Tasks by Status"
-            data={analytics.tasksByStatus}
-            total={analytics.totalTasks}
-            getColor={getStatusColor}
-            formatLabel={(key) => key.replace('-', ' ')}
-          />
-        </div>
-
-        {/* Productivity Insights */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            Productivity Insights
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {insightCards.map((insight, index) => (
-              <InsightCard
-                key={index}
-                emoji={insight.emoji}
-                title={insight.title}
-                description={insight.description}
-                colorClass={insight.colorClass}
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <ChartCard
+                title="Tasks by Priority"
+                data={analytics.tasksByPriority}
+                total={analytics.totalTasks}
+                getColor={getPriorityColor}
               />
-            ))}
-          </div>
-        </div>
 
-        {/* Summary Cards */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            Task Summary
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            {summaryData.map((item, index) => (
-              <div key={index}>
-                <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
-                <p className="text-sm text-gray-600">{item.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+              <ChartCard
+                title="Tasks by Status"
+                data={analytics.tasksByStatus}
+                total={analytics.totalTasks}
+                getColor={getStatusColor}
+                formatLabel={(key) => key.replace('-', ' ')}
+              />
+            </div>
 
-        {/* Action Items */}
-        {analytics.overdueTasks > 0 && (
-          <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-              <div>
-                <h4 className="text-lg font-semibold text-red-800 mb-2">Action Required</h4>
-                <p className="text-red-700 mb-4">
-                  You have {analytics.overdueTasks} overdue task{analytics.overdueTasks > 1 ? 's' : ''}. 
-                  Consider reviewing and updating the due dates or completing these tasks soon.
-                </p>
-                <Link
-                  href="/tasks"
-                  className="inline-flex items-center px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  View Overdue Tasks
-                  <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
+            {/* Productivity Insights */}
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Productivity Insights
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {insightCards.map((insight, index) => (
+                  <InsightCard
+                    key={index}
+                    emoji={insight.emoji}
+                    title={insight.title}
+                    description={insight.description}
+                    colorClass={insight.colorClass}
+                  />
+                ))}
               </div>
             </div>
-          </div>
+
+            {/* Summary Cards */}
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Task Summary
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                {summaryData.map((item, index) => (
+                  <div key={index}>
+                    <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
+                    <p className="text-sm text-gray-600">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Items */}
+            {analytics.overdueTasks > 0 && (
+              <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div>
+                    <h4 className="text-lg font-semibold text-red-800 mb-2">Action Required</h4>
+                    <p className="text-red-700 mb-4">
+                      You have {analytics.overdueTasks} overdue task{analytics.overdueTasks > 1 ? 's' : ''}. 
+                      Consider reviewing and updating the due dates or completing these tasks soon.
+                    </p>
+                    <Link
+                      href="/tasks"
+                      className="inline-flex items-center px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      View Overdue Tasks
+                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
