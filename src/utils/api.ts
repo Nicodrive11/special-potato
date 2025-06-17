@@ -218,16 +218,17 @@ class ApiService {
     }
   }
 
-  async deleteTask(): Promise<boolean> {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 200));
-      return true;
-    } catch (error) {
-      console.error('Error in deleteTask:', error);
-      throw new Error('Failed to delete task');
-    }
+async deleteTask(id: number): Promise<boolean> {
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log(`Deleting task with id: ${id}`);
+    return true;
+  } catch (error) {
+    console.error('Error in deleteTask:', error);
+    throw new Error('Failed to delete task');
   }
+}
 
   // Added User methods for testing compatibility
   async getUsers(): Promise<{ users: User[] }> {
@@ -283,9 +284,10 @@ class ApiService {
     }
   }
 
-  async deleteUser(): Promise<void> {
+  async deleteUser(id: number): Promise<void> {
     try {
       await new Promise(resolve => setTimeout(resolve, 200));
+      console.log(`Deleting user with id: ${id}`);
       // Deletion successful
     } catch (error) {
       console.error('Error in deleteUser:', error);
