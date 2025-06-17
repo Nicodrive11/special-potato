@@ -17,8 +17,8 @@ function TaskItem({ task }: TaskItemProps) {
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
       <div className="flex-1">
         <h4 className="font-medium text-gray-900">{task.title}</h4>
-        {task.dueDate && (
-          <p className="text-sm text-gray-500 mt-1">Due: {task.dueDate}</p>
+        {task.due_date && (
+          <p className="text-sm text-gray-500 mt-1">Due: {task.due_date}</p>
         )}
       </div>
       <div className="flex items-center space-x-3">
