@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image'
 import apiService, { User } from '@/utils/api';
 
 interface UserListProps {
@@ -141,6 +142,8 @@ export default function UserList({ compact = false }: UserListProps) {
                 <Image
                   src={user.avatar_url}
                   alt={user.name}
+                  width={compact ? 32 : 48}
+                  height={compact ? 32 : 48}
                   className={`rounded-full object-cover ${compact ? 'w-8 h-8' : 'w-12 h-12'}`}
                 />
               ) : (
