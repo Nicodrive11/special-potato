@@ -6,59 +6,39 @@ interface MetricCardProps {
   value: string | number;
   subtitle?: string;
   icon: React.ReactNode;
-  color: 'green' | 'blue' | 'indigo' | 'red' | 'yellow' | 'gray';
+  color: 'green' | 'blue' | 'indigo' | 'red' | 'yellow' | 'purple';
 }
 
 export default function MetricCard({ title, value, subtitle, icon, color }: MetricCardProps) {
-  const getColorClasses = (color: string) => {
-    switch (color) {
-      case 'green':
-        return {
-          text: 'text-green-600',
-          bg: 'bg-green-100'
-        };
-      case 'blue':
-        return {
-          text: 'text-blue-600',
-          bg: 'bg-blue-100'
-        };
-      case 'indigo':
-        return {
-          text: 'text-indigo-600',
-          bg: 'bg-indigo-100'
-        };
-      case 'red':
-        return {
-          text: 'text-red-600',
-          bg: 'bg-red-100'
-        };
-      case 'yellow':
-        return {
-          text: 'text-yellow-600',
-          bg: 'bg-yellow-100'
-        };
-      default:
-        return {
-          text: 'text-gray-600',
-          bg: 'bg-gray-100'
-        };
-    }
+  const colorClasses = {
+    green: 'bg-green-50 dark:bg-green-900 border-green-200 dark:border-green-700',
+    blue: 'bg-blue-50 dark:bg-blue-900 border-blue-200 dark:border-blue-700',
+    indigo: 'bg-indigo-50 dark:bg-indigo-900 border-indigo-200 dark:border-indigo-700',
+    red: 'bg-red-50 dark:bg-red-900 border-red-200 dark:border-red-700',
+    yellow: 'bg-yellow-50 dark:bg-yellow-900 border-yellow-200 dark:border-yellow-700',
+    purple: 'bg-purple-50 dark:bg-purple-900 border-purple-200 dark:border-purple-700'
   };
 
-  const colorClasses = getColorClasses(color);
-
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className={`text-3xl font-bold ${colorClasses.text}`}>{value}</p>
-          {subtitle && (
-            <p className="text-xs text-gray-500">{subtitle}</p>
-          )}
-        </div>
-        <div className={`p-3 ${colorClasses.bg} rounded-full`}>
+    <div className={`card border-l-4 ${colorClasses[color]}`}>
+      <div className="flex items-center">
+        <div className="flex-shrink-0">
           {icon}
+        </div>
+        <div className="ml-4 flex-1">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            {title}
+          </p>
+          <div className="flex items-baseline">
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {value}
+            </p>
+            {subtitle && (
+              <p className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                {subtitle}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
