@@ -159,8 +159,8 @@ export default function UserList({ compact = false }: UserListProps) {
                 <h3 className={`font-semibold ${compact ? 'text-sm' : 'text-base'} text-gray-900 truncate`}>
                   {user.name}
                 </h3>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                  {user.role}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role || 'user')}`}>
+                  {user.role || 'user'}
                 </span>
               </div>
               
