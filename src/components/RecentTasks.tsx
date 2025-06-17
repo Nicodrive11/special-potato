@@ -25,8 +25,8 @@ function TaskItem({ task }: TaskItemProps) {
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
           {task.priority}
         </span>
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-          {task.status}
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.task_status)}`}>
+          {task.task_status}
         </span>
       </div>
     </div>
