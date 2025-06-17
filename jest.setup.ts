@@ -52,11 +52,16 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+  
   constructor() {}
   observe() { return null }
   disconnect() { return null }
   unobserve() { return null }
-}
+  takeRecords() { return [] }
+} as any
 
 // Reset all mocks before each test
 beforeEach(() => {
