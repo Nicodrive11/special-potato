@@ -29,7 +29,7 @@ export default function SettingsPage() {
     }));
   };
 
-  const handlePreferenceChange = (key: keyof typeof preferences, value: any) => {
+  const handlePreferenceChange = (key: keyof typeof preferences, value: object) => {
     setPreferences(prev => ({
       ...prev,
       [key]: value

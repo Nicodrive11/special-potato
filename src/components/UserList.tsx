@@ -138,7 +138,7 @@ export default function UserList({ compact = false }: UserListProps) {
             {/* Avatar */}
             <div className="flex-shrink-0">
               {user.avatar_url ? (
-                <img
+                <Image
                   src={user.avatar_url}
                   alt={user.name}
                   className={`rounded-full object-cover ${compact ? 'w-8 h-8' : 'w-12 h-12'}`}

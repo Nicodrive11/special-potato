@@ -218,7 +218,7 @@ class ApiService {
     }
   }
 
-  async deleteTask(id: number): Promise<boolean> {
+  async deleteTask(): Promise<boolean> {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
@@ -283,7 +283,7 @@ class ApiService {
     }
   }
 
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(): Promise<void> {
     try {
       await new Promise(resolve => setTimeout(resolve, 200));
       // Deletion successful
