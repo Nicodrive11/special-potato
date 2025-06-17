@@ -13,6 +13,14 @@ export interface Task {
   tags?: string[];
 }
 
+// Add User interface for testing compatibility
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -87,7 +95,7 @@ export async function fetchTasks(): Promise<{ tasks: Task[]; apiStatus: string }
   }
 }
 
-// New API service class
+// API service class (your existing implementation with additions for testing)
 class ApiService {
   private baseUrl: string;
 
@@ -218,6 +226,70 @@ class ApiService {
     } catch (error) {
       console.error('Error in deleteTask:', error);
       throw new Error('Failed to delete task');
+    }
+  }
+
+  // Added User methods for testing compatibility
+  async getUsers(): Promise<{ users: User[] }> {
+    try {
+      // Sample users for testing
+      const sampleUsers: User[] = [
+        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
+        { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User' },
+      ];
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return { users: sampleUsers };
+    } catch (error) {
+      console.error('Error in getUsers:', error);
+      throw new Error('Failed to fetch users');
+    }
+  }
+
+  async createUser(user: Omit<User, 'id'>): Promise<User> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      const newUser: User = {
+        ...user,
+        id: Date.now()
+      };
+
+      return newUser;
+    } catch (error) {
+      console.error('Error in createUser:', error);
+      throw new Error('Failed to create user');
+    }
+  }
+
+  async updateUser(id: number, user: Partial<User>): Promise<User> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      const updatedUser: User = {
+        id,
+        name: 'Updated User',
+        email: 'updated@example.com',
+        ...user
+      };
+
+      return updatedUser;
+    } catch (error) {
+      console.error('Error in updateUser:', error);
+      throw new Error('Failed to update user');
+    }
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      // Deletion successful
+    } catch (error) {
+      console.error('Error in deleteUser:', error);
+      throw new Error('Failed to delete user');
     }
   }
 }

@@ -1,41 +1,81 @@
 // src/utils/ui.ts
-// UI utility functions for consistent styling across components
 
-export const getPriorityColor = (priority: string): string => {
-  switch (priority) {
-    case 'urgent': return 'text-red-700 bg-red-100';
-    case 'high': return 'text-orange-700 bg-orange-100';
-    case 'medium': return 'text-yellow-700 bg-yellow-100';
-    case 'low': return 'text-green-700 bg-green-100';
-    default: return 'text-gray-700 bg-gray-100';
+export function getPriorityColor(priority: string): string {
+  switch (priority?.toLowerCase()) {
+    case 'urgent':
+      return 'priority-urgent';
+    case 'high':
+      return 'priority-high';
+    case 'medium':
+      return 'priority-medium';
+    case 'low':
+      return 'priority-low';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
   }
-};
+}
 
-export const getStatusColor = (status: string): string => {
-  switch (status) {
-    case 'completed': return 'text-green-700 bg-green-100';
-    case 'in-progress': return 'text-blue-700 bg-blue-100';
-    case 'pending': return 'text-gray-700 bg-gray-100';
-    default: return 'text-gray-700 bg-gray-100';
+export function getStatusColor(status: string): string {
+  switch (status?.toLowerCase()) {
+    case 'completed':
+      return 'status-completed';
+    case 'in-progress':
+      return 'status-in-progress';
+    case 'pending':
+      return 'status-pending';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
   }
-};
+}
 
-export const getPriorityColorBorder = (priority: string): string => {
-  switch (priority) {
-    case 'urgent': return 'border-l-red-500 bg-red-50';
-    case 'high': return 'border-l-orange-500 bg-orange-50';
-    case 'medium': return 'border-l-yellow-500 bg-yellow-50';
-    case 'low': return 'border-l-green-500 bg-green-50';
-    default: return 'border-l-gray-500 bg-gray-50';
+export function formatDate(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+export function formatDateTime(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+export function getTimeAgo(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return 'just now';
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
   }
-};
+}
 
-export const formatDate = (dateString?: string): string => {
-  if (!dateString) return 'No date';
-  return new Date(dateString).toLocaleDateString();
-};
+export function isOverdue(dueDate: string | Date): boolean {
+  const dateObj = typeof dueDate === 'string' ? new Date(dueDate) : dueDate;
+  const now = new Date();
+  return dateObj < now;
+}
 
-export const formatDateTime = (dateString?: string): string => {
-  if (!dateString) return 'No date';
-  return new Date(dateString).toLocaleString();
-};
+export function getDaysUntilDue(dueDate: string | Date): number {
+  const dateObj = typeof dueDate === 'string' ? new Date(dueDate) : dueDate;
+  const now = new Date();
+  const diffInMilliseconds = dateObj.getTime() - now.getTime();
+  return Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24));
+}
