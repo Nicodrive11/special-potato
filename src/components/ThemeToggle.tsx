@@ -1,8 +1,8 @@
 // src/components/ThemeToggle.tsx
 'use client';
 
-import { useTheme } from '@/contexts/ThemeContext';
 import { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ThemeToggleProps {
   variant?: 'nav' | 'button' | 'minimal';
@@ -13,16 +13,8 @@ export default function ThemeToggle({ variant = 'nav', showLabel = true }: Theme
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   
-  // Use a try-catch to handle cases where provider might not be available yet
-  let themeContext;
-  try {
-    themeContext = useTheme();
-  } catch (error) {
-    // Fallback for when provider is not available
-    themeContext = { theme: 'light', toggleTheme: () => {} };
-  }
-  
-  const { theme, toggleTheme } = themeContext;
+  // Always call useTheme hook at the top level - never conditionally
+  const { theme, toggleTheme } = useTheme();
 
   // Prevent hydration mismatch
   useEffect(() => {

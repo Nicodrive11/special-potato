@@ -1,7 +1,7 @@
 // src/contexts/ThemeContext.tsx
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -17,54 +17,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('taskflow-theme') as Theme;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    setThemeState(initialTheme);
     setMounted(true);
+    // Check for saved theme or system preference
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const initialTheme = savedTheme || systemTheme;
+    setThemeState(initialTheme);
   }, []);
 
-  // Apply theme to document
   useEffect(() => {
-    if (mounted) {
-      const root = document.documentElement;
-      
-      // Remove existing theme classes
-      root.classList.remove('light', 'dark');
-      
-      // Add new theme class
-      root.classList.add(theme);
-      
-      // Save to localStorage
-      localStorage.setItem('taskflow-theme', theme);
-      
-      // Update the data-theme attribute for additional CSS targeting
-      root.setAttribute('data-theme', theme);
-      
-      console.log('Theme applied:', theme); // Debug log
+    if (!mounted) return;
+    
+    localStorage.setItem('theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setThemeState(prev => {
-      const newTheme = prev === 'light' ? 'dark' : 'light';
-      console.log('Toggling theme from', prev, 'to', newTheme); // Debug log
-      return newTheme;
-    });
+    setThemeState(prev => prev === 'light' ? 'dark' : 'light');
   };
 
   const setTheme = (newTheme: Theme) => {
-    console.log('Setting theme to:', newTheme); // Debug log
     setThemeState(newTheme);
   };
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return <div style={{ visibility: 'hidden' }}>{children}</div>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
@@ -76,7 +55,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    // Provide fallback instead of throwing error
+    console.warn('useTheme must be used within a ThemeProvider. Using fallback values.');
+    return {
+      theme: 'light' as const,
+      toggleTheme: () => {
+        console.warn('toggleTheme called outside ThemeProvider');
+      },
+      setTheme: (theme: Theme) => {
+        console.warn('setTheme called outside ThemeProvider with:', theme);
+      }
+    };
   }
   return context;
 }

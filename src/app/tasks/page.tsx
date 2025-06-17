@@ -89,7 +89,7 @@ export default function TasksPage() {
     // Don't change opacity here - we'll handle it in CSS
   };
 
-  const handleDragEnd = (e: React.DragEvent) => {
+  const handleDragEnd = () => {
     // Clean up drag state
     setDraggedTask(null);
     setDragOverColumn(null);
@@ -235,7 +235,7 @@ export default function TasksPage() {
           <TaskModal
             task={editingTask}
             onClose={() => setShowCreateModal(false)}
-            onSave={(taskData) => {
+            onSave={() => {
               // Handle save logic here
               setShowCreateModal(false);
               loadTasks(); // Reload tasks

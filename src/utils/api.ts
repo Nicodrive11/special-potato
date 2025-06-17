@@ -13,12 +13,20 @@ export interface Task {
   tags?: string[];
 }
 
-// Add User interface for testing compatibility
 export interface User {
   id: number;
   name: string;
   email: string;
   role?: string;
+  created_date?: string;
+  updated_date?: string;
+  avatar_url?: string;
+  task_statistics?: {
+    total_tasks: number;
+    completed_tasks: number;
+    in_progress_tasks: number;
+    pending_tasks: number;
+  };
 }
 
 export interface ApiResponse<T> {
@@ -218,16 +226,17 @@ class ApiService {
     }
   }
 
-  async deleteTask(id: number): Promise<boolean> {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 200));
-      return true;
-    } catch (error) {
-      console.error('Error in deleteTask:', error);
-      throw new Error('Failed to delete task');
-    }
+async deleteTask(id: number): Promise<boolean> {
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log(`Deleting task with id: ${id}`);
+    return true;
+  } catch (error) {
+    console.error('Error in deleteTask:', error);
+    throw new Error('Failed to delete task');
   }
+}
 
   // Added User methods for testing compatibility
   async getUsers(): Promise<{ users: User[] }> {
@@ -286,6 +295,7 @@ class ApiService {
   async deleteUser(id: number): Promise<void> {
     try {
       await new Promise(resolve => setTimeout(resolve, 200));
+      console.log(`Deleting user with id: ${id}`);
       // Deletion successful
     } catch (error) {
       console.error('Error in deleteUser:', error);

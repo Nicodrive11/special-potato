@@ -30,8 +30,10 @@ const localStorageMock = {
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
+  length: 0,
+  key: jest.fn(() => null),
 }
-global.localStorage = localStorageMock
+global.localStorage = localStorageMock as Storage
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -50,11 +52,16 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+  
   constructor() {}
   observe() { return null }
   disconnect() { return null }
   unobserve() { return null }
-}
+  takeRecords() { return [] }
+} as any
 
 // Reset all mocks before each test
 beforeEach(() => {

@@ -1,3 +1,4 @@
+// src/components/ApiDebugPanel.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ export default function ApiDebugPanel() {
   const [results, setResults] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  const testEndpoint = async (testName: string, testFn: () => Promise<any>) => {
+  const testEndpoint = async (testName: string, testFn: () => Promise<object>) => {
     setLoading(true);
     try {
       const result = await testFn();

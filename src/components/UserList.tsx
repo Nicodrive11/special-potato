@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image'
 import apiService, { User } from '@/utils/api';
 
 interface UserListProps {
@@ -138,9 +139,11 @@ export default function UserList({ compact = false }: UserListProps) {
             {/* Avatar */}
             <div className="flex-shrink-0">
               {user.avatar_url ? (
-                <img
+                <Image
                   src={user.avatar_url}
                   alt={user.name}
+                  width={compact ? 32 : 48}
+                  height={compact ? 32 : 48}
                   className={`rounded-full object-cover ${compact ? 'w-8 h-8' : 'w-12 h-12'}`}
                 />
               ) : (
@@ -156,8 +159,8 @@ export default function UserList({ compact = false }: UserListProps) {
                 <h3 className={`font-semibold ${compact ? 'text-sm' : 'text-base'} text-gray-900 truncate`}>
                   {user.name}
                 </h3>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                  {user.role}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role || 'user')}`}>
+                  {user.role || 'user'}
                 </span>
               </div>
               
