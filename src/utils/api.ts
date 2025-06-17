@@ -13,12 +13,20 @@ export interface Task {
   tags?: string[];
 }
 
-// Add User interface for testing compatibility
 export interface User {
   id: number;
   name: string;
   email: string;
   role?: string;
+  created_date?: string;
+  updated_date?: string;
+  avatar_url?: string;
+  task_statistics?: {
+    total_tasks: number;
+    completed_tasks: number;
+    in_progress_tasks: number;
+    pending_tasks: number;
+  };
 }
 
 export interface ApiResponse<T> {
