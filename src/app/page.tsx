@@ -58,7 +58,7 @@ function HeroSection() {
           </Link>
         </div>
         <div className="md:w-1/2 flex justify-center">
-          <div className="w-50 h-40 bg-white bg-opacity-20 dark:bg-white dark:bg-opacity-20 rounded-lg flex items-center justify-center relative">
+          <div className="w-40 h-40 bg-white bg-opacity-20 dark:bg-black dark:bg-opacity-20 rounded-lg flex items-center justify-center relative">
             <Image
               src="/next.svg"
               alt="TaskFlow Kanban Board"
@@ -67,7 +67,7 @@ function HeroSection() {
               className="opacity-75 scale-75"
               style={{ width: 'auto', height: 'auto' }}
             />
-            {/* <span className="absolute bottom-4 text-indigo-100 dark:text-purple-100 text-sm font-semibold"></span> */}
+            <span className="absolute bottom-4 text-indigo-100 dark:text-purple-100 text-sm font-semibold"></span>
           </div>
         </div>
       </div>
