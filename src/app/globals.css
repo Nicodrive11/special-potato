@@ -146,13 +146,13 @@
   }
   
   .dark .task-card {
-    background-color: #1f2937;
+    background-color: #2f3b4b;
     color: #f9fafb;
   }
   
   .kanban-column {
     @apply rounded-lg p-4 min-h-96 transition-all duration-200;
-    background-color: #f3f4f6;
+    background-color: #d5dae2;
   }
   
   .dark .kanban-column {
