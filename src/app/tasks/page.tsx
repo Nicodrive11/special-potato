@@ -189,7 +189,7 @@ export default function TasksPage() {
                 onDrop={(e) => handleDrop(e, column.id)}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-semibold brand-text">
                     {column.title}
                   </h3>
                   <span className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full text-sm font-medium">
@@ -279,7 +279,7 @@ function TaskCard({ task, onEdit, onDelete, onStatusChange, onDragStart, onDragE
       onDragEnd={onDragEnd}
     >
       <div className="flex items-start justify-between mb-3">
-        <h4 className="font-medium text-gray-900 dark:text-gray-100 flex-1 pr-2">
+        <h4 className="font-medium brand-text flex-1 pr-2">
           {task.title}
         </h4>
         <div className="flex items-center space-x-1">

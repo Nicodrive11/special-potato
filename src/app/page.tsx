@@ -103,7 +103,7 @@ function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
     <div className="card">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Tasks</h3>
+          <h3 className="text-lg font-semibold brand-text">Recent Tasks</h3>
           <Link href="/tasks" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium transition-colors">
             View All
           </Link>
@@ -135,7 +135,7 @@ function ApiConnectionStatus({ status }: { status: string }) {
     <div className="card mb-8">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">API Connection Status</h3>
+          <h3 className="text-sm font-semibold brand-text">API Connection Status</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{status}</p>
         </div>
         <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`}></div>

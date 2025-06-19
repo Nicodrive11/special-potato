@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* Tailwind v4 theme configuration */
+
 @theme {
   --font-family-inter: 'Inter', system-ui, sans-serif;
   --font-family-poppins: 'Poppins', system-ui, sans-serif;
@@ -43,18 +43,18 @@
   
   body {
     background-color: #f9fafb;
-    color: #374151; /* Changed from #111827 to lighter gray */
+    color: #1f2937;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   .dark body {
     background-color: #111827;
-    color: #39638d;
+    color: #5c76a9;
   }
   
   h1, h2, h3, h4, h5, h6 {
     transition: color 0.3s ease;
-    color: #1f2937; /* Changed from #111827 to slightly lighter */
+    color: #111827;
   }
   
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
@@ -108,7 +108,7 @@
   .card {
     @apply rounded-lg shadow-md p-6 transition-all duration-300;
     background-color: white;
-    color: #111827;
+    color: #111827; /* Ensure card text is dark enough */
     border: 1px solid #e5e7eb;
   }
   
@@ -142,7 +142,7 @@
   .task-card {
     @apply rounded-lg p-4 shadow-sm border-l-4 cursor-move hover:shadow-md transition-all duration-200 transform hover:scale-[1.02];
     background-color: white;
-    color: #111827;
+    color: #111827; /* Ensure task text is dark enough */
   }
   
   .dark .task-card {
@@ -162,7 +162,7 @@
   .stats-card {
     @apply rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-200;
     background-color: white;
-    color: #111827;
+    color: #111827; /* Ensure stats text is dark enough */
     border: 1px solid #e5e7eb;
   }
   
@@ -193,7 +193,7 @@
   
   .nav-link {
     @apply px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
-    color: #4b5563;
+    color: #374151; /* Darker gray for better contrast */
   }
   
   .dark .nav-link {
@@ -210,6 +210,7 @@
   
   .nav-link-active {
     color: #4f46e5;
+    font-weight: 600; /* Make active links bolder */
   }
   
   .dark .nav-link-active {
@@ -217,7 +218,7 @@
   }
   
   .bg-gradient-primary {
-    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    background: linear-gradient(135deg, #041326 0%, #e0e7ff 100%);
   }
   
   .dark .bg-gradient-primary {
@@ -336,6 +337,14 @@
     background-color: #7f1d1d;
     border-color: #ef4444;
     color: #fca5a5;
+  }
+
+  .brand-text {
+    color: #0f1629; /* Very dark blue */
+  }
+  
+  .dark .brand-text {
+    color: #dbeafe; /* Light blue */
   }
 }
 

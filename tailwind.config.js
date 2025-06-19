@@ -19,6 +19,20 @@ module.exports = {
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
+        },
+        // Override gray colors for better contrast
+        gray: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',  // Make this darker for better contrast
+          700: '#374151',  // Make this darker
+          800: '#1f2937',
+          900: '#111827',  // Ensure this is very dark
+          950: '#030712',
         }
       },
       animation: {

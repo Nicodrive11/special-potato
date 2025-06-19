@@ -187,7 +187,7 @@ export default function AnalyticsPage() {
 
             {/* Productivity Insights */}
             <div className="card mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+              <h3 className="text-lg font-semibold brand-text">
                 Productivity Insights
               </h3>
               
@@ -206,7 +206,7 @@ export default function AnalyticsPage() {
 
             {/* Summary Cards */}
             <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+              <h3 className="text-lg font-semibold brand-text">
                 Task Summary
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">

@@ -55,7 +55,7 @@ export default function SettingsPage() {
           {/* Theme Settings */}
           <div className="card">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <h2 className="text-xl font-semibold brand-text">
                 Appearance
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
@@ -67,7 +67,7 @@ export default function SettingsPage() {
               {/* Theme Selection */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-medium brand-text">
                     Theme
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -108,7 +108,7 @@ export default function SettingsPage() {
                     <div className="h-2 bg-gray-600 rounded mb-1"></div>
                     <div className="h-2 bg-gray-700 rounded w-3/4"></div>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Dark</span>
+                  <span className="text-sm font-medium text-black-900 dark:text-black-100">Dark</span>
                 </button>
 
                 <button
@@ -128,7 +128,7 @@ export default function SettingsPage() {
                       <div className="h-2 bg-gray-700 rounded w-3/4"></div>
                     </div>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">System</span>
+                  <span className="text-sm font-medium brand-text">System</span>
                 </button>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function SettingsPage() {
           {/* Notification Settings */}
           <div className="card">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <h2 className="text-xl font-semibold brand-text">
                 Notifications
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
@@ -149,7 +149,7 @@ export default function SettingsPage() {
               {Object.entries(notifications).map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <h3 className="text-sm font-bold brand-text">
                       {key === 'email' && 'Email Notifications'}
                       {key === 'push' && 'Push Notifications'}
                       {key === 'taskReminders' && 'Task Reminders'}
@@ -182,7 +182,7 @@ export default function SettingsPage() {
           {/* Preferences */}
           <div className="card">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <h2 className="text-xl font-semibold brand-text">
                 Preferences
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
@@ -193,7 +193,7 @@ export default function SettingsPage() {
             <div className="space-y-6">
               {/* Default View */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <label className="block text-sm font-medium brand-text">
                   Default View
                 </label>
                 <select
@@ -209,7 +209,7 @@ export default function SettingsPage() {
 
               {/* Task Sort Order */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <label className="block text-sm font-medium brand-text">
                   Task Sort Order
                 </label>
                 <select
@@ -228,7 +228,7 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <h3 className="text-sm font-bold brand-text">
                       Auto Save
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -251,7 +251,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <h3 className="text-sm font-bold brand-text">
                       Show Completed Tasks
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -278,7 +278,7 @@ export default function SettingsPage() {
           {/* Account Settings */}
           <div className="card">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <h2 className="text-xl font-semibold brand-text">
                 Account
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
@@ -286,7 +286,7 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex space-x-6">
               <button className="btn-secondary">
                 Export Data
               </button>

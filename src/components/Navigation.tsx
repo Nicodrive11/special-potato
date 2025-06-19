@@ -38,7 +38,7 @@ export default function Navigation() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-gray-100">TaskFlow</span>
+<span className="text-xl font-bold brand-text">TaskFlow</span>
             </Link>
           </div>
           

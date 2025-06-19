@@ -74,7 +74,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {item.title}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-2xl font-bold brand-text">
                 {item.value}
               </p>
             </div>
