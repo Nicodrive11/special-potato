@@ -5,6 +5,9 @@ import ClientLayoutWrapper from '@/components/ClientLayoutWrapper'
 export const metadata: Metadata = {
   title: 'TaskFlow - Task Management App',
   description: 'Manage your tasks efficiently with our intuitive kanban board system.',
+  icons: {
+    icon: '/icon.png'
+  }
 }
 
 export default function RootLayout({
