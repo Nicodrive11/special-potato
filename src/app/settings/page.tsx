@@ -1,4 +1,3 @@
-// src/app/settings/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -41,7 +40,6 @@ export default function SettingsPage() {
       <Navigation />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Settings
@@ -52,7 +50,6 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-8">
-          {/* Theme Settings */}
           <div className="card">
             <div className="mb-6">
               <h2 className="text-xl font-semibold brand-text">
@@ -64,7 +61,6 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Theme Selection */}
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-medium brand-text">
@@ -79,7 +75,6 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Theme Options */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => setTheme('light')}
@@ -134,7 +129,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Notification Settings */}
           <div className="card">
             <div className="mb-6">
               <h2 className="text-xl font-semibold brand-text">
@@ -179,7 +173,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Preferences */}
           <div className="card">
             <div className="mb-6">
               <h2 className="text-xl font-semibold brand-text">
@@ -191,7 +184,6 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Default View */}
               <div>
                 <label className="block text-sm font-medium brand-text">
                   Default View
@@ -207,7 +199,6 @@ export default function SettingsPage() {
                 </select>
               </div>
 
-              {/* Task Sort Order */}
               <div>
                 <label className="block text-sm font-medium brand-text">
                   Task Sort Order
@@ -224,7 +215,6 @@ export default function SettingsPage() {
                 </select>
               </div>
 
-              {/* Toggle Preferences */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -275,7 +265,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Account Settings */}
           <div className="card">
             <div className="mb-6">
               <h2 className="text-xl font-semibold brand-text">
@@ -299,12 +288,10 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Save Button */}
           <div className="flex justify-end">
             <button
               className="btn-primary"
               onClick={() => {
-                // Handle save logic here
                 alert('Settings saved successfully!');
               }}
             >

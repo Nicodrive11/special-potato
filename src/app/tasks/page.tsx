@@ -1,4 +1,3 @@
-// src/app/tasks/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -63,34 +62,27 @@ export default function TasksPage() {
   };
 
   const handleStatusChange = async (taskId: number, newStatus: TaskStatus) => {
-    // Optimistic update - update UI immediately
     const oldTasks = [...tasks];
     setTasks(tasks.map(task => 
       task.id === taskId ? { ...task, task_status: newStatus } : task
     ));
 
     try {
-      // Then update the backend
       await apiService.updateTask(taskId, { task_status: newStatus });
     } catch (error) {
-      // If API fails, revert to old state
       console.error('Error updating task status:', error);
       setTasks(oldTasks);
-      // Optionally show error notification
       alert('Failed to update task status. Please try again.');
     }
   };
 
-  // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.currentTarget.outerHTML);
-    // Don't change opacity here - we'll handle it in CSS
   };
 
   const handleDragEnd = () => {
-    // Clean up drag state
     setDraggedTask(null);
     setDragOverColumn(null);
   };
@@ -106,7 +98,6 @@ export default function TasksPage() {
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
-    // Only clear if we're actually leaving the column (not just moving to a child element)
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX;
     const y = e.clientY;
@@ -121,7 +112,6 @@ export default function TasksPage() {
     setDragOverColumn(null);
     
     if (draggedTask && draggedTask.task_status !== columnId) {
-      // Immediately update UI for instant feedback
       await handleStatusChange(draggedTask.id, columnId);
     }
     setDraggedTask(null);
@@ -150,7 +140,6 @@ export default function TasksPage() {
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-start">
             <div>
@@ -173,10 +162,8 @@ export default function TasksPage() {
           </div>
         </div>
 
-        {/* Loading State */}
         {loading && <Loading size="lg" text="Loading tasks..." />}
 
-        {/* Kanban Board */}
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {columns.map((column) => (
@@ -230,15 +217,13 @@ export default function TasksPage() {
           </div>
         )}
 
-        {/* Create/Edit Modal */}
         {showCreateModal && (
           <TaskModal
             task={editingTask}
             onClose={() => setShowCreateModal(false)}
             onSave={() => {
-              // Handle save logic here
               setShowCreateModal(false);
-              loadTasks(); // Reload tasks
+              loadTasks();
             }}
           />
         )}
@@ -247,7 +232,6 @@ export default function TasksPage() {
   );
 }
 
-// Task Card Component
 interface TaskCardProps {
   task: Task;
   onEdit: () => void;
@@ -283,7 +267,6 @@ function TaskCard({ task, onEdit, onDelete, onStatusChange, onDragStart, onDragE
           {task.title}
         </h4>
         <div className="flex items-center space-x-1">
-          {/* Drag Handle */}
           <div className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
@@ -354,7 +337,6 @@ function TaskCard({ task, onEdit, onDelete, onStatusChange, onDragStart, onDragE
         </div>
       )}
 
-      {/* Quick Status Change */}
       <div className="mt-3 flex space-x-1">
         {(['pending', 'in-progress', 'completed'] as TaskStatus[]).map((status) => (
           <button
@@ -378,7 +360,6 @@ function TaskCard({ task, onEdit, onDelete, onStatusChange, onDragStart, onDragE
   );
 }
 
-// Task Modal Component (simplified version)
 interface TaskModalProps {
   task?: Task | null;
   onClose: () => void;

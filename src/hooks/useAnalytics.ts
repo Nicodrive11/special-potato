@@ -1,4 +1,3 @@
-// src/hooks/useAnalytics.ts
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -51,35 +50,29 @@ export function useAnalytics() {
       setLoading(true);
       const { tasks } = await apiService.getTasks();
       
-      // Calculate basic metrics
       const totalTasks = tasks.length;
       const completedTasks = tasks.filter(task => task.task_status === 'completed').length;
       const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
       
-      // Calculate average completion time (simplified - using random data for demo)
-      const averageCompletionTime = Math.round(Math.random() * 7) + 1; // 1-8 days
+      const averageCompletionTime = Math.round(Math.random() * 7) + 1;
       
-      // Calculate tasks this week
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       const tasksThisWeek = tasks.filter(task => 
         new Date(task.created_date) >= oneWeekAgo
       ).length;
       
-      // Calculate overdue tasks
       const now = new Date();
       const overdueTasks = tasks.filter(task => 
         task.due_date && new Date(task.due_date) < now && task.task_status !== 'completed'
       ).length;
       
-      // Group by status
       const tasksByStatus = {
         pending: tasks.filter(task => task.task_status === 'pending').length,
         'in-progress': tasks.filter(task => task.task_status === 'in-progress').length,
         completed: tasks.filter(task => task.task_status === 'completed').length
       };
       
-      // Group by priority
       const tasksByPriority = {
         low: tasks.filter(task => task.priority === 'low').length,
         medium: tasks.filter(task => task.priority === 'medium').length,
@@ -98,7 +91,6 @@ export function useAnalytics() {
       });
     } catch (error) {
       console.error('Error calculating analytics:', error);
-      // Keep default analytics on error
     } finally {
       setLoading(false);
     }

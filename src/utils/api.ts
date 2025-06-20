@@ -1,5 +1,3 @@
-// src/utils/api.ts
-
 export interface Task {
   id: number;
   title: string;
@@ -43,11 +41,8 @@ export interface TasksResponse {
   limit?: number;
 }
 
-// Legacy fetchTasks function for backward compatibility
 export async function fetchTasks(): Promise<{ tasks: Task[]; apiStatus: string }> {
   try {
-    // This would be your actual API endpoint
-    // For now, we'll return sample data
     const sampleTasks: Task[] = [
       {
         id: 1,
@@ -87,7 +82,6 @@ export async function fetchTasks(): Promise<{ tasks: Task[]; apiStatus: string }
       }
     ];
 
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
     return {
@@ -103,7 +97,6 @@ export async function fetchTasks(): Promise<{ tasks: Task[]; apiStatus: string }
   }
 }
 
-// API service class (your existing implementation with additions for testing)
 class ApiService {
   private baseUrl: string;
 
@@ -113,7 +106,6 @@ class ApiService {
 
   async getTasks(): Promise<TasksResponse> {
     try {
-      // For now, return sample data since we don't have a real API
       const sampleTasks: Task[] = [
         {
           id: 1,
@@ -162,7 +154,6 @@ class ApiService {
         }
       ];
 
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 300));
 
       return {
@@ -187,12 +178,11 @@ class ApiService {
 
   async createTask(task: Omit<Task, 'id' | 'created_date'>): Promise<Task> {
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
 
       const newTask: Task = {
         ...task,
-        id: Date.now(), // Simple ID generation for demo
+        id: Date.now(), 
         created_date: new Date().toISOString()
       };
 
@@ -205,7 +195,6 @@ class ApiService {
 
   async updateTask(id: number, updates: Partial<Task>): Promise<Task> {
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 200));
 
       const existingTask = await this.getTask(id);
@@ -228,7 +217,6 @@ class ApiService {
 
 async deleteTask(id: number): Promise<boolean> {
   try {
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 200));
     console.log(`Deleting task with id: ${id}`);
     return true;
@@ -238,17 +226,14 @@ async deleteTask(id: number): Promise<boolean> {
   }
 }
 
-  // Added User methods for testing compatibility
   async getUsers(): Promise<{ users: User[] }> {
     try {
-      // Sample users for testing
       const sampleUsers: User[] = [
         { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
         { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
         { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User' },
       ];
 
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 300));
 
       return { users: sampleUsers };
@@ -296,7 +281,6 @@ async deleteTask(id: number): Promise<boolean> {
     try {
       await new Promise(resolve => setTimeout(resolve, 200));
       console.log(`Deleting user with id: ${id}`);
-      // Deletion successful
     } catch (error) {
       console.error('Error in deleteUser:', error);
       throw new Error('Failed to delete user');
@@ -304,6 +288,5 @@ async deleteTask(id: number): Promise<boolean> {
   }
 }
 
-// Export a singleton instance
 const apiService = new ApiService();
 export default apiService;

@@ -1,4 +1,3 @@
-// src/components/Layout.tsx
 'use client';
 
 import Link from 'next/link';
@@ -14,11 +13,9 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
       <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            {/* Logo and brand */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-3">
                 <div className="relative w-8 h-8">
@@ -37,7 +34,6 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <Link
                 href="/"
@@ -59,7 +55,6 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
             </div>
 
-            {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -84,7 +79,6 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
           {isMobileMenuOpen && (
             <div className="md:hidden pb-4">
               <div className="space-y-1">
@@ -115,12 +109,10 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </nav>
 
-      {/* Main content */}
       <main className="flex-1">
         {children}
       </main>
 
-      {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="text-center text-gray-500 text-sm">

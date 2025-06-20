@@ -1,4 +1,3 @@
-// src/components/Navigation.tsx (Updated with custom logo)
 'use client';
 
 import Link from 'next/link';
@@ -28,7 +27,6 @@ export default function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
-              {/* Option 1: Use your logo image */}
               <div className="w-8 h-8 rounded-lg overflow-hidden">
                 <Image
                   src="/brick-pile.png"
@@ -43,7 +41,6 @@ export default function Navigation() {
           </div>
           
           <div className="flex items-center space-x-6">
-            {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => (
                 <Link
@@ -58,17 +55,14 @@ export default function Navigation() {
               ))}
             </div>
             
-            {/* Theme Toggle */}
             <div className="hidden sm:flex items-center">
               <ThemeToggle variant="nav" showLabel={false} />
             </div>
             
-            {/* Mobile Theme Toggle */}
             <div className="sm:hidden">
               <ThemeToggle variant="minimal" showLabel={false} />
             </div>
             
-            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 type="button"
@@ -90,7 +84,6 @@ export default function Navigation() {
           </div>
         </div>
         
-        {/* Mobile Navigation Menu */}
         <div className={`md:hidden border-t border-gray-200 dark:border-gray-700 transition-all duration-200 ${
           isMobileMenuOpen ? 'block pt-2 pb-3 space-y-1' : 'hidden'
         }`}>

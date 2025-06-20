@@ -1,4 +1,3 @@
-// __tests__/TaskFormModal.test.tsx (Fixed)
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -14,7 +13,6 @@ describe('TaskFormModal Component', () => {
     mockOnSubmit.mockClear()
   })
 
-  // Test 1: Modal renders when open
   test('renders modal content when isOpen is true', () => {
     render(
       <TaskFormModal 
@@ -28,7 +26,6 @@ describe('TaskFormModal Component', () => {
     expect(screen.getByRole('button', { name: /add task/i })).toBeInTheDocument()
   })
 
-  // Test 2: Modal doesn't render when closed
   test('does not render when isOpen is false', () => {
     render(
       <TaskFormModal 
@@ -41,7 +38,6 @@ describe('TaskFormModal Component', () => {
     expect(screen.queryByText('Add New Task')).not.toBeInTheDocument()
   })
 
-  // Test 3: Form submission
   test('submits form when filled out correctly', async () => {
     const user = userEvent.setup()
     
@@ -53,9 +49,8 @@ describe('TaskFormModal Component', () => {
       />
     )
 
-    // Get form inputs more specifically
     const textInputs = screen.getAllByRole('textbox')
-    const titleInput = textInputs[0] // First textbox is title
+    const titleInput = textInputs[0]
     const prioritySelect = screen.getByRole('combobox')
     const submitButton = screen.getByRole('button', { name: /add task/i })
 
@@ -68,7 +63,6 @@ describe('TaskFormModal Component', () => {
     })
   })
 
-  // Test 4: Close functionality
   test('calls onClose when cancel button is clicked', async () => {
     const user = userEvent.setup()
     

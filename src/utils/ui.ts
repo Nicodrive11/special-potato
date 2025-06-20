@@ -1,5 +1,3 @@
-// src/utils/ui.ts
-
 export function getPriorityColor(priority: string): string {
   switch (priority?.toLowerCase()) {
     case 'urgent':

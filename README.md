@@ -53,6 +53,7 @@ Loading states are implemented throughout the application using custom Loading c
 ### Responsive Design Strategy
 The mobile-first approach ensures great performance on all devices. The kanban board transforms from a three-column desktop layout to a stacked mobile layout using CSS Grid and Flexbox. Navigation collapses into a hamburger menu on smaller screens, and all interactive elements maintain proper touch targets (44px minimum).
 
+
 ## 🚀 Getting Started
 
 ### Prerequisites

@@ -1,4 +1,3 @@
-// src/components/ThemeToggle.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,10 +12,8 @@ export default function ThemeToggle({ variant = 'nav', showLabel = true }: Theme
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   
-  // Always call useTheme hook at the top level - never conditionally
   const { theme, toggleTheme } = useTheme();
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -27,7 +24,6 @@ export default function ThemeToggle({ variant = 'nav', showLabel = true }: Theme
     setTimeout(() => setIsAnimating(false), 300);
   };
 
-  // Show nothing until mounted to prevent hydration issues
   if (!mounted) {
     return (
       <div className={`${variant === 'minimal' ? 'w-9 h-9' : variant === 'button' ? 'w-24 h-10' : 'w-20 h-6'}`}>
@@ -81,7 +77,6 @@ export default function ThemeToggle({ variant = 'nav', showLabel = true }: Theme
     );
   }
 
-  // Default nav variant with toggle switch
   return (
     <div className="flex items-center space-x-3">
       {showLabel && (

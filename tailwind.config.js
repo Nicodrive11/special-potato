@@ -1,4 +1,3 @@
-// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,7 +5,7 @@ module.exports = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class', // Enable class-based dark mode
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -20,7 +19,6 @@ module.exports = {
           600: '#2563eb',
           700: '#1d4ed8',
         },
-        // Override gray colors for better contrast
         gray: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -28,10 +26,10 @@ module.exports = {
           300: '#d1d5db',
           400: '#9ca3af',
           500: '#6b7280',
-          600: '#4b5563',  // Make this darker for better contrast
-          700: '#374151',  // Make this darker
+          600: '#4b5563', 
+          700: '#374151', 
           800: '#1f2937',
-          900: '#111827',  // Ensure this is very dark
+          900: '#111827', 
           950: '#030712',
         }
       },

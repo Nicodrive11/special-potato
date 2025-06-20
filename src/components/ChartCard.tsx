@@ -1,4 +1,3 @@
-// src/components/ChartCard.tsx
 'use client';
 
 interface ChartCardProps {

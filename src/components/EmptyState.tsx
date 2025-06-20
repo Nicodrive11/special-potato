@@ -1,4 +1,3 @@
-// src/components/EmptyState.tsx
 'use client';
 
 interface EmptyStateProps {
