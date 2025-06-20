@@ -383,7 +383,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="card max-w-md w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="text-lg font-semibold text-gray-500 dark:text-gray-500">
             {task ? 'Edit Task' : 'Create New Task'}
           </h3>
           <button
@@ -398,7 +398,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
               Title
             </label>
             <input
@@ -411,7 +411,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
               Description
             </label>
             <textarea
@@ -424,7 +424,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
                 Priority
               </label>
               <select
@@ -440,7 +440,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
                 Due Date
               </label>
               <input

@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
   ];
 
   const summaryData = [
-    { label: 'Total Tasks', value: analytics.totalTasks, color: 'text-gray-900 dark:text-gray-100' },
+    { label: 'Total Tasks', value: analytics.totalTasks, color: 'text-gray-900 dark:text-black-200' },
     { label: 'To Do', value: analytics.tasksByStatus.pending || 0, color: 'text-gray-600 dark:text-gray-400' },
     { label: 'In Progress', value: analytics.tasksByStatus['in-progress'] || 0, color: 'text-blue-600 dark:text-blue-400' },
     { label: 'Completed', value: analytics.tasksByStatus.completed || 0, color: 'text-green-600 dark:text-green-400' }
@@ -219,8 +219,8 @@ export default function AnalyticsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   <div>
-                    <h4 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">Action Required</h4>
-                    <p className="text-red-700 dark:text-red-200 mb-4">
+                    <h4 className="text-lg font-semibold text-red-900 dark:text-red-500 mb-2">Action Required</h4>
+                    <p className="text-red-800 dark:text-red-400 mb-4">
                       You have {analytics.overdueTasks} overdue task{analytics.overdueTasks > 1 ? 's' : ''}. 
                       Consider reviewing and updating the due dates or completing these tasks soon.
                     </p>

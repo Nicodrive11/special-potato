@@ -33,7 +33,7 @@ export default function ChartCard({
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center flex-1">
               <div className={`w-4 h-4 rounded-full ${item.color} mr-3`}></div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-500 capitalize">
                 {item.label}
               </span>
             </div>
