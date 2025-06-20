@@ -1,4 +1,3 @@
-// src/app/page.tsx
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -17,7 +16,6 @@ interface Stats {
   pending: number;
 }
 
-// Component: Status Banner
 function StatusBanner({ status }: { status: string }) {
   if (!status) return null;
 
@@ -34,7 +32,6 @@ function StatusBanner({ status }: { status: string }) {
   );
 }
 
-// Component: Hero Section
 function HeroSection() {
   return (
     <div className="bg-hero-gradient rounded-xl p-8 mb-8 text-white">
@@ -58,16 +55,16 @@ function HeroSection() {
           </Link>
         </div>
         <div className="md:w-1/2 flex justify-center">
-          <div className="w-64 h-48 bg-white bg-opacity-20 dark:bg-black dark:bg-opacity-20 rounded-lg flex items-center justify-center relative">
+          <div className="w-40 h-40 bg-white bg-opacity-20 dark:bg-black dark:bg-opacity-20 rounded-lg flex items-center justify-center relative">
             <Image
               src="/next.svg"
               alt="TaskFlow Kanban Board"
               width={100}
               height={40}
-              className="opacity-75"
+              className="opacity-75 scale-75"
               style={{ width: 'auto', height: 'auto' }}
             />
-            <span className="absolute bottom-4 text-indigo-100 dark:text-purple-100 text-sm font-semibold">📋 Kanban Board</span>
+            <span className="absolute bottom-4 text-indigo-100 dark:text-purple-100 text-sm font-semibold"></span>
           </div>
         </div>
       </div>
@@ -75,7 +72,6 @@ function HeroSection() {
   );
 }
 
-// Component: Task Item
 function TaskItem({ task }: { task: Task }) {
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
@@ -97,13 +93,12 @@ function TaskItem({ task }: { task: Task }) {
   );
 }
 
-// Component: Recent Tasks
 function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
   return (
     <div className="card">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Tasks</h3>
+          <h3 className="text-lg font-semibold brand-text">Recent Tasks</h3>
           <Link href="/tasks" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium transition-colors">
             View All
           </Link>
@@ -127,7 +122,6 @@ function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
   );
 }
 
-// API Connection Status Component
 function ApiConnectionStatus({ status }: { status: string }) {
   const isConnected = status.includes('✅');
   
@@ -135,7 +129,7 @@ function ApiConnectionStatus({ status }: { status: string }) {
     <div className="card mb-8">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">API Connection Status</h3>
+          <h3 className="text-sm font-semibold brand-text">API Connection Status</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{status}</p>
         </div>
         <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
@@ -144,13 +138,11 @@ function ApiConnectionStatus({ status }: { status: string }) {
   );
 }
 
-// Main Dashboard Component
 export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiStatus, setApiStatus] = useState<string>('Connecting to API...');
 
-  // Use useMemo for derived state
   const stats: Stats = useMemo(() => ({
     total: tasks.length,
     completed: tasks.filter(task => task.task_status === 'completed').length,
@@ -159,12 +151,10 @@ export default function Dashboard() {
   }), [tasks]);
 
   useEffect(() => {
-    // Enhanced task loading with proper API integration
     const loadTasks = async () => {
       try {
         setLoading(true);
         
-        // Try the new API service first
         const response = await apiService.getTasks();
         setTasks(response.tasks || []);
         setApiStatus(`✅ Connected to TaskFlow API (${response.tasks?.length || 0} tasks loaded)`);
@@ -173,7 +163,6 @@ export default function Dashboard() {
         console.error('New API failed, trying legacy fetchTasks:', error);
         
         try {
-          // Fallback to legacy fetchTasks function
           const { tasks: fetchedTasks, apiStatus: status } = await fetchTasks();
           setTasks(fetchedTasks);
           setApiStatus(status);
@@ -181,7 +170,6 @@ export default function Dashboard() {
           console.error('All API methods failed:', legacyError);
           setApiStatus('❌ Failed to connect to API - using sample data');
           
-          // Final fallback to sample data
           const sampleTasks: Task[] = [
             { 
               id: 1, 
@@ -230,7 +218,6 @@ export default function Dashboard() {
       <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-start">
             <div>
@@ -252,7 +239,6 @@ export default function Dashboard() {
           <StatusBanner status={apiStatus} />
         </div>
 
-        {/* API Connection Status */}
         <ApiConnectionStatus status={apiStatus} />
 
         <HeroSection />
@@ -260,7 +246,6 @@ export default function Dashboard() {
         <RecentTasks tasks={tasks} loading={loading} />
       </main>
 
-      {/* Footer */}
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="text-center text-gray-500 dark:text-gray-400 text-sm">

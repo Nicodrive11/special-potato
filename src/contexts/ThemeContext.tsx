@@ -1,4 +1,3 @@
-// src/contexts/ThemeContext.tsx
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -19,7 +18,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    // Check for saved theme or system preference
     const savedTheme = localStorage.getItem('theme') as Theme;
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const initialTheme = savedTheme || systemTheme;
@@ -55,7 +53,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    // Provide fallback instead of throwing error
     console.warn('useTheme must be used within a ThemeProvider. Using fallback values.');
     return {
       theme: 'light' as const,

@@ -1,4 +1,3 @@
-// src/components/ClientLayoutWrapper.tsx
 'use client';
 
 import { ThemeProvider } from '@/contexts/ThemeContext';

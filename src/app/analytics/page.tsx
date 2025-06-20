@@ -1,4 +1,3 @@
-// src/app/analytics/page.tsx
 'use client';
  
 import Link from 'next/link';
@@ -127,7 +126,6 @@ export default function AnalyticsPage() {
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-start">
             <div>
@@ -148,12 +146,10 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Loading State */}
         {loading && <Loading size="lg" text="Loading analytics data..." />}
 
         {!loading && (
           <>
-            {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {metricCards.map((metric, index) => (
                 <MetricCard
@@ -167,7 +163,6 @@ export default function AnalyticsPage() {
               ))}
             </div>
 
-            {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               <ChartCard
                 title="Tasks by Priority"
@@ -185,9 +180,8 @@ export default function AnalyticsPage() {
               />
             </div>
 
-            {/* Productivity Insights */}
             <div className="card mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+              <h3 className="text-lg font-semibold brand-text">
                 Productivity Insights
               </h3>
               
@@ -204,9 +198,8 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Summary Cards */}
             <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+              <h3 className="text-lg font-semibold brand-text">
                 Task Summary
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -219,7 +212,6 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Action Items */}
             {analytics.overdueTasks > 0 && (
               <div className="mt-8 alert-error border p-6 rounded-lg">
                 <div className="flex items-start">

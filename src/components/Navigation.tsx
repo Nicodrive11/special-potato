@@ -1,7 +1,7 @@
-// src/components/Navigation.tsx (Merged - keeping your design and functionality)
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
@@ -27,17 +27,20 @@ export default function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
+              <div className="w-8 h-8 rounded-lg overflow-hidden">
+                <Image
+                  src="/brick-pile.png"
+                  alt="TaskFlow Logo"
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-gray-100">TaskFlow</span>
+<span className="text-xl font-bold brand-text">TaskFlow</span>
             </Link>
           </div>
           
           <div className="flex items-center space-x-6">
-            {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => (
                 <Link
@@ -52,17 +55,14 @@ export default function Navigation() {
               ))}
             </div>
             
-            {/* Theme Toggle */}
             <div className="hidden sm:flex items-center">
               <ThemeToggle variant="nav" showLabel={false} />
             </div>
             
-            {/* Mobile Theme Toggle */}
             <div className="sm:hidden">
               <ThemeToggle variant="minimal" showLabel={false} />
             </div>
             
-            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 type="button"
@@ -84,7 +84,6 @@ export default function Navigation() {
           </div>
         </div>
         
-        {/* Mobile Navigation Menu */}
         <div className={`md:hidden border-t border-gray-200 dark:border-gray-700 transition-all duration-200 ${
           isMobileMenuOpen ? 'block pt-2 pb-3 space-y-1' : 'hidden'
         }`}>

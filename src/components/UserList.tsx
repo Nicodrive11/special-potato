@@ -27,7 +27,6 @@ export default function UserList({ compact = false }: UserListProps) {
       console.error('Failed to load users:', err);
       setError('Failed to load users from API');
       
-      // Fallback to sample users
       const sampleUsers: User[] = [
         {
           id: 1,
@@ -136,7 +135,6 @@ export default function UserList({ compact = false }: UserListProps) {
           }`}
         >
           <div className="flex items-center gap-4">
-            {/* Avatar */}
             <div className="flex-shrink-0">
               {user.avatar_url ? (
                 <Image
@@ -153,7 +151,6 @@ export default function UserList({ compact = false }: UserListProps) {
               )}
             </div>
 
-            {/* User Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1">
                 <h3 className={`font-semibold ${compact ? 'text-sm' : 'text-base'} text-gray-900 truncate`}>
@@ -178,7 +175,6 @@ export default function UserList({ compact = false }: UserListProps) {
               )}
             </div>
 
-            {/* Task Statistics */}
             {user.task_statistics && !compact && (
               <div className="flex-shrink-0">
                 <div className="grid grid-cols-2 gap-2 text-center">

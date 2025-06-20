@@ -1,4 +1,3 @@
-// src/components/TaskFormModal.tsx
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -41,7 +40,6 @@ export default function TaskFormModal({ isOpen, onClose, onSubmit, initialData }
     
     onSubmit(formData);
     
-    // Reset form
     setFormData({
       title: '',
       description: '',

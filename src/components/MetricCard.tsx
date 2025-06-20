@@ -1,4 +1,3 @@
-// src/components/MetricCard.tsx
 'use client';
 
 interface MetricCardProps {

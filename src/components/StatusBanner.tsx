@@ -1,4 +1,3 @@
-// src/components/StatusBanner.tsx
 interface StatusBannerProps {
   status: string;
 }

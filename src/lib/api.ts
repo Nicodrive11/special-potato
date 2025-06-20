@@ -64,7 +64,6 @@ class ApiService {
     }
   }
 
-  // Task endpoints
   async getTasks(): Promise<Task[]> {
     return this.request<Task[]>('/tasks');
   }
@@ -93,7 +92,6 @@ class ApiService {
     });
   }
 
-  // User endpoints (if available)
   async getUsers(): Promise<User[]> {
     return this.request<User[]>('/users');
   }
@@ -102,7 +100,6 @@ class ApiService {
     return this.request<User>(`/users/${id}`);
   }
 
-  // Projects endpoints (if available)
   async getProjects(): Promise<Project[]> {
     return this.request<Project[]>('/projects');
   }

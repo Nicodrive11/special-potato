@@ -1,4 +1,3 @@
-// src/hooks/useTasks.ts
 import { useState, useEffect } from 'react';
 import { Task, fetchTasks } from '@/utils/api';
 
@@ -18,7 +17,6 @@ export const useTasks = () => {
   const loadTasks = async () => {
     setLoading(true);
     try {
-      // Use the existing fetchTasks function
       const { tasks: fetchedTasks, apiStatus: status } = await fetchTasks();
       setTasks(fetchedTasks);
       setApiStatus(status);
@@ -26,7 +24,6 @@ export const useTasks = () => {
       console.log('API unavailable, using mock data', error);
       setApiStatus('⚠️ TaskFlow API unavailable - showing sample data');
       
-      // Mock data fallback
       const mockTasks: Task[] = [
         { 
           id: 1, 
@@ -73,7 +70,6 @@ export const useTasks = () => {
 
   const createTask = async (taskData: TaskFormData): Promise<boolean> => {
     try {
-      // For now, just add locally since we're using the existing API structure
       const newTask: Task = {
         ...taskData,
         id: Date.now(),

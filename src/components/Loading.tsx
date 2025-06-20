@@ -1,4 +1,3 @@
-// src/components/Loading.tsx
 'use client';
 
 interface LoadingProps {

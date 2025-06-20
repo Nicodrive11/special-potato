@@ -35,22 +35,20 @@ const localStorageMock = {
 }
 global.localStorage = localStorageMock as Storage
 
-// Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
+    addListener: jest.fn(), 
+    removeListener: jest.fn(), 
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
 })
 
-// Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   root = null;
   rootMargin = '';
@@ -63,7 +61,6 @@ global.IntersectionObserver = class IntersectionObserver {
   takeRecords() { return [] }
 } as any
 
-// Reset all mocks before each test
 beforeEach(() => {
   mockFetch.mockClear()
   localStorageMock.getItem.mockClear()

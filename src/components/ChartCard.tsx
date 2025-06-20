@@ -1,4 +1,3 @@
-// src/components/ChartCard.tsx
 'use client';
 
 interface ChartCardProps {
@@ -25,7 +24,7 @@ export default function ChartCard({
 
   return (
     <div className="card">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+      <h3 className="text-lg font-semibold brand-text">
         {title}
       </h3>
       
@@ -48,7 +47,7 @@ export default function ChartCard({
                   style={{ width: `${item.percentage}%` }}
                 ></div>
               </div>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-10 text-right">
+              <span className="text-sm font-medium brand-text text-right">
                 {item.percentage}%
               </span>
             </div>

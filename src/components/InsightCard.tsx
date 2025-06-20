@@ -1,4 +1,3 @@
-// src/components/InsightCard.tsx
 'use client';
 
 interface InsightCardProps {

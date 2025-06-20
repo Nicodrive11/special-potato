@@ -1,4 +1,3 @@
-// src/components/KanbanColumn.tsx
 'use client';
 
 import { Task } from '@/utils/api';

@@ -1,8 +1,7 @@
-/* src/app/globals.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* Tailwind v4 theme configuration */
+
 @theme {
   --font-family-inter: 'Inter', system-ui, sans-serif;
   --font-family-poppins: 'Poppins', system-ui, sans-serif;
@@ -43,18 +42,18 @@
   
   body {
     background-color: #f9fafb;
-    color: #374151; /* Changed from #111827 to lighter gray */
+    color: #1f2937;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   .dark body {
     background-color: #111827;
-    color: #39638d;
+    color: #5c76a9;
   }
   
   h1, h2, h3, h4, h5, h6 {
     transition: color 0.3s ease;
-    color: #1f2937; /* Changed from #111827 to slightly lighter */
+    color: #111827;
   }
   
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
@@ -146,13 +145,13 @@
   }
   
   .dark .task-card {
-    background-color: #1f2937;
+    background-color: #2f3b4b;
     color: #f9fafb;
   }
   
   .kanban-column {
     @apply rounded-lg p-4 min-h-96 transition-all duration-200;
-    background-color: #f3f4f6;
+    background-color: #d5dae2;
   }
   
   .dark .kanban-column {
@@ -193,7 +192,7 @@
   
   .nav-link {
     @apply px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
-    color: #4b5563;
+    color: #374151;
   }
   
   .dark .nav-link {
@@ -210,6 +209,7 @@
   
   .nav-link-active {
     color: #4f46e5;
+    font-weight: 600;
   }
   
   .dark .nav-link-active {
@@ -217,7 +217,7 @@
   }
   
   .bg-gradient-primary {
-    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    background: linear-gradient(135deg, #041326 0%, #e0e7ff 100%);
   }
   
   .dark .bg-gradient-primary {
@@ -337,6 +337,14 @@
     border-color: #ef4444;
     color: #fca5a5;
   }
+
+  .brand-text {
+    color: #0f1629;
+  }
+  
+  .dark .brand-text {
+    color: #dbeafe;
+  }
 }
 
 @layer utilities {
@@ -376,7 +384,6 @@
   }
 }
 
-/* Custom scrollbar with dark mode support */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -407,7 +414,6 @@
   background-color: #6b7280;
 }
 
-/* Smooth transitions for all interactive elements */
 * {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

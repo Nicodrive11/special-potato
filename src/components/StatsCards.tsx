@@ -1,4 +1,3 @@
-// src/components/StatsCards.tsx
 'use client';
 
 interface Stats {
@@ -74,13 +73,12 @@ export default function StatsCards({ stats }: StatsCardsProps) {
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {item.title}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-2xl font-bold brand-text">
                 {item.value}
               </p>
             </div>
           </div>
           
-          {/* Progress bar for completed tasks */}
           {item.title === 'Completed' && stats.total > 0 && (
             <div className="mt-4">
               <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -96,7 +94,6 @@ export default function StatsCards({ stats }: StatsCardsProps) {
             </div>
           )}
           
-          {/* Trend indicator */}
           {item.title === 'In Progress' && (
             <div className="mt-4 flex items-center text-xs text-blue-600 dark:text-blue-400">
               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

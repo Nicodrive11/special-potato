@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next'
 import './globals.css'
 import ClientLayoutWrapper from '@/components/ClientLayoutWrapper'

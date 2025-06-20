@@ -1,9 +1,7 @@
-// __tests__/Pages.test.tsx (Simple page tests without context dependencies)
 import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-// Mock Next.js navigation
 jest.mock('next/navigation', () => ({
   usePathname: () => '/',
   useRouter: () => ({
@@ -13,7 +11,6 @@ jest.mock('next/navigation', () => ({
   }),
 }))
 
-// Mock API calls
 jest.mock('@/utils/api', () => ({
   __esModule: true,
   default: {
@@ -24,7 +21,6 @@ jest.mock('@/utils/api', () => ({
 }))
 
 describe('Page Components', () => {
-  // Test 18: Tasks page renders without errors
   test('tasks page renders without crashing', async () => {
     let TasksPage
     try {
@@ -32,12 +28,10 @@ describe('Page Components', () => {
       const { container } = render(<TasksPage />)
       expect(container).toBeInTheDocument()
     } catch (error) {
-      // If page doesn't exist or has dependencies, that's ok for this test
       expect(true).toBe(true)
     }
   })
 
-  // Test 19: Analytics page renders without errors
   test('analytics page renders without crashing', async () => {
     let AnalyticsPage
     try {
@@ -45,12 +39,10 @@ describe('Page Components', () => {
       const { container } = render(<AnalyticsPage />)
       expect(container).toBeInTheDocument()
     } catch (error) {
-      // If page doesn't exist or has dependencies, that's ok for this test
       expect(true).toBe(true)
     }
   })
 
-  // Test 20: Settings page renders without errors
   test('settings page renders without crashing', async () => {
     let SettingsPage
     try {
@@ -58,7 +50,6 @@ describe('Page Components', () => {
       const { container } = render(<SettingsPage />)
       expect(container).toBeInTheDocument()
     } catch (error) {
-      // If page doesn't exist or has dependencies, that's ok for this test
       expect(true).toBe(true)
     }
   })

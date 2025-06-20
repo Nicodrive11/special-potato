@@ -27,7 +27,6 @@ export interface TasksResponse {
   limit?: number;
 }
 
-// Mock data using your Task interface
 export const mockTasks: Task[] = [
   {
     id: 1,
@@ -64,7 +63,6 @@ export const mockUsers: User[] = [
   { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User' },
 ];
 
-// Mock the legacy fetchTasks function
 export const fetchTasks = jest.fn(() => 
   Promise.resolve({
     tasks: mockTasks,
@@ -72,7 +70,6 @@ export const fetchTasks = jest.fn(() =>
   })
 );
 
-// Mock the ApiService class
 const mockApiService = {
   getTasks: jest.fn(() => Promise.resolve({ 
     tasks: mockTasks, 
