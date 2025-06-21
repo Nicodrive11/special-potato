@@ -130,7 +130,6 @@ export default function TasksPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          {/* Mobile layout: stacked */}
           <div className="block sm:hidden">
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -144,7 +143,6 @@ export default function TasksPage() {
               </div>
             </div>
             
-            {/* Mobile buttons */}
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleCreateTask}
@@ -184,7 +182,6 @@ export default function TasksPage() {
             </div>
           </div>
 
-          {/* Desktop layout: side by side */}
           <div className="hidden sm:flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -198,7 +195,6 @@ export default function TasksPage() {
               </div>
             </div>
             
-            {/* Desktop buttons */}
             <div className="flex space-x-3 flex-shrink-0 ml-6">
               <button
                 onClick={handleCreateTask}
@@ -462,7 +458,6 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
     due_date: ''
   });
 
-  // Update form data when task prop changes (for editing)
   useEffect(() => {
     if (task) {
       setFormData({
@@ -473,7 +468,6 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
         due_date: task.due_date || ''
       });
     } else {
-      // Reset form for new task
       setFormData({
         title: '',
         description: '',

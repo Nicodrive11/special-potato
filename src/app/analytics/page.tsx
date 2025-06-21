@@ -24,17 +24,14 @@ export default function AnalyticsPage() {
     const overdueTasks = getOverdueTasks();
     const tasksThisWeek = getTasksThisWeek();
     
-    // Calculate average completion time (simplified - using random for demo)
     const averageCompletionTime = Math.round(Math.random() * 7) + 1;
     
-    // Group tasks by status
     const tasksByStatus = {
       pending: getTasksByStatus('pending').length,
       'in-progress': getTasksByStatus('in-progress').length,
       completed: getTasksByStatus('completed').length
     };
     
-    // Group tasks by priority
     const tasksByPriority = {
       low: getTasksByPriority('low').length,
       medium: getTasksByPriority('medium').length,
