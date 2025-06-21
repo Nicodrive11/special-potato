@@ -52,7 +52,7 @@ export default function AnalyticsPage() {
       tasksByStatus,
       tasksByPriority
     };
-  }, [tasks, getTaskStats, getOverdueTasks, getTasksThisWeek, getTasksByStatus, getTasksByPriority]);
+  }, [getTaskStats, getOverdueTasks, getTasksThisWeek, getTasksByStatus, getTasksByPriority]);
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {

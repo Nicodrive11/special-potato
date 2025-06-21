@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useLocalTasks } from '@/hooks/useLocalTasks';
+import { useLocalTasks, Task } from '@/hooks/useLocalTasks';
 import { getPriorityColor, getStatusColor } from '@/utils/ui';
 import StatsCards from '@/components/StatsCards';
 import Navigation from '@/components/Navigation';
@@ -55,7 +55,7 @@ function HeroSection() {
   );
 }
 
-function TaskItem({ task }: { task: any }) {
+function TaskItem({ task }: { task: Task }) {
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
       <div className="flex-1">
@@ -76,7 +76,7 @@ function TaskItem({ task }: { task: any }) {
   );
 }
 
-function RecentTasks({ tasks, loading }: { tasks: any[]; loading: boolean }) {
+function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
   return (
     <div className="card">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -147,7 +147,7 @@ export default function Dashboard() {
       inProgress: taskStats.inProgress,
       pending: taskStats.pending
     };
-  }, [tasks, getTaskStats]);
+  }, [getTaskStats]);
 
   const handleClearAllTasks = () => {
     if (confirm('This will delete all tasks permanently. Are you sure?')) {
