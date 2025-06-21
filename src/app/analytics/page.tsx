@@ -11,7 +11,6 @@ import { useMemo } from 'react';
 
 export default function AnalyticsPage() {
   const { 
-    tasks, 
     loading, 
     getTaskStats, 
     getOverdueTasks, 

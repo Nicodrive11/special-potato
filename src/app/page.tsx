@@ -149,12 +149,6 @@ export default function Dashboard() {
     };
   }, [getTaskStats]);
 
-  const handleClearAllTasks = () => {
-    if (confirm('This will delete all tasks permanently. Are you sure?')) {
-      clearAllTasks();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-primary transition-colors duration-300">
       <Navigation />
