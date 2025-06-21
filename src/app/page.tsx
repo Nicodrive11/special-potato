@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchTasks, type Task } from '@/utils/api';
-import apiService from '@/utils/api';
+import { useLocalTasks } from '@/hooks/useLocalTasks';
 import { getPriorityColor, getStatusColor } from '@/utils/ui';
 import StatsCards from '@/components/StatsCards';
 import Navigation from '@/components/Navigation';
@@ -14,22 +13,6 @@ interface Stats {
   completed: number;
   inProgress: number;
   pending: number;
-}
-
-function StatusBanner({ status }: { status: string }) {
-  if (!status) return null;
-
-  const isSuccess = status.includes('✅');
-  
-  return (
-    <div className={`mt-2 p-3 border rounded-md text-sm transition-colors ${
-      isSuccess 
-        ? 'alert-success border' 
-        : 'alert-warning border'
-    }`}>
-      {status}
-    </div>
-  );
 }
 
 function HeroSection() {
@@ -72,7 +55,7 @@ function HeroSection() {
   );
 }
 
-function TaskItem({ task }: { task: Task }) {
+function TaskItem({ task }: { task: any }) {
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
       <div className="flex-1">
@@ -93,7 +76,7 @@ function TaskItem({ task }: { task: Task }) {
   );
 }
 
-function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
+function RecentTasks({ tasks, loading }: { tasks: any[]; loading: boolean }) {
   return (
     <div className="card">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -115,6 +98,17 @@ function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
             {tasks.slice(0, 3).map((task) => (
               <TaskItem key={task.id} task={task} />
             ))}
+            {tasks.length === 0 && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p className="text-sm">No tasks yet</p>
+                <Link href="/tasks" className="mt-2 inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
+                  Create your first task
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -122,94 +116,42 @@ function RecentTasks({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
   );
 }
 
-function ApiConnectionStatus({ status }: { status: string }) {
-  const isConnected = status.includes('✅');
-  
+function LocalStorageStatus({ taskCount }: { taskCount: number }) {
   return (
     <div className="card mb-8">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold brand-text">API Connection Status</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{status}</p>
+          <h3 className="text-sm font-semibold brand-text">Local Storage Status</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            📁 {taskCount} tasks stored locally in your browser
+          </p>
         </div>
-        <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+        <div className="w-4 h-4 rounded-full bg-green-500"></div>
       </div>
     </div>
   );
 }
 
 export default function Dashboard() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [apiStatus, setApiStatus] = useState<string>('Connecting to API...');
+  const { 
+    tasks, 
+    loading, 
+    getTaskStats
+  } = useLocalTasks();
 
-  const stats: Stats = useMemo(() => ({
-    total: tasks.length,
-    completed: tasks.filter(task => task.task_status === 'completed').length,
-    inProgress: tasks.filter(task => task.task_status === 'in-progress').length,
-    pending: tasks.filter(task => task.task_status === 'pending').length
-  }), [tasks]);
-
-  useEffect(() => {
-    const loadTasks = async () => {
-      try {
-        setLoading(true);
-        
-        const response = await apiService.getTasks();
-        setTasks(response.tasks || []);
-        setApiStatus(`✅ Connected to TaskFlow API (${response.tasks?.length || 0} tasks loaded)`);
-        
-      } catch (error) {
-        console.error('New API failed, trying legacy fetchTasks:', error);
-        
-        try {
-          const { tasks: fetchedTasks, apiStatus: status } = await fetchTasks();
-          setTasks(fetchedTasks);
-          setApiStatus(status);
-        } catch (legacyError) {
-          console.error('All API methods failed:', legacyError);
-          setApiStatus('❌ Failed to connect to API - using sample data');
-          
-          const sampleTasks: Task[] = [
-            { 
-              id: 1, 
-              title: 'Connect to API', 
-              description: 'Establish connection to backend API',
-              task_status: 'in-progress', 
-              priority: 'high', 
-              due_date: '2025-06-15',
-              created_date: '2025-06-01'
-            },
-            { 
-              id: 2, 
-              title: 'Create Components', 
-              description: 'Build React components for tasks',
-              task_status: 'pending', 
-              priority: 'medium', 
-              due_date: '2025-06-20',
-              created_date: '2025-06-02'
-            }
-          ];
-          setTasks(sampleTasks);
-        }
-      } finally {
-        setLoading(false);
-      }
+  const stats: Stats = useMemo(() => {
+    const taskStats = getTaskStats();
+    return {
+      total: taskStats.total,
+      completed: taskStats.completed,
+      inProgress: taskStats.inProgress,
+      pending: taskStats.pending
     };
+  }, [tasks, getTaskStats]);
 
-    loadTasks();
-  }, []);
-
-  const refreshData = async () => {
-    setLoading(true);
-    try {
-      const response = await apiService.getTasks();
-      setTasks(response.tasks || []);
-      setApiStatus(`✅ Connected to TaskFlow API (${response.tasks?.length || 0} tasks loaded) - Refreshed at ${new Date().toLocaleTimeString()}`);
-    } catch (error) {
-      setApiStatus(`❌ Refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setLoading(false);
+  const handleClearAllTasks = () => {
+    if (confirm('This will delete all tasks permanently. Are you sure?')) {
+      clearAllTasks();
     }
   };
 
@@ -228,18 +170,10 @@ export default function Dashboard() {
                 Manage your tasks efficiently with our intuitive kanban board system.
               </p>
             </div>
-            <button
-              onClick={refreshData}
-              disabled={loading}
-              className="btn-primary disabled:opacity-50"
-            >
-              {loading ? 'Refreshing...' : 'Refresh Data'}
-            </button>
           </div>
-          <StatusBanner status={apiStatus} />
         </div>
 
-        <ApiConnectionStatus status={apiStatus} />
+        <LocalStorageStatus taskCount={tasks.length} />
 
         <HeroSection />
         <StatsCards stats={stats} />
@@ -250,6 +184,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>&copy; 2025 TaskFlow. Built with Next.js and Tailwind CSS.</p>
+            <p className="mt-1">📁 All data stored locally in your browser</p>
           </div>
         </div>
       </footer>

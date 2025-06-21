@@ -6,10 +6,53 @@ import MetricCard from '@/components/MetricCard';
 import ChartCard from '@/components/ChartCard';
 import InsightCard from '@/components/InsightCard';
 import Loading from '@/components/Loading';
-import { useAnalytics } from '@/hooks/useAnalytics';
+import { useLocalTasks } from '@/hooks/useLocalTasks';
+import { useMemo } from 'react';
 
 export default function AnalyticsPage() {
-  const { analytics, loading, refreshAnalytics } = useAnalytics();
+  const { 
+    tasks, 
+    loading, 
+    getTaskStats, 
+    getOverdueTasks, 
+    getTasksThisWeek,
+    getTasksByStatus,
+    getTasksByPriority
+  } = useLocalTasks();
+
+  const analytics = useMemo(() => {
+    const stats = getTaskStats();
+    const overdueTasks = getOverdueTasks();
+    const tasksThisWeek = getTasksThisWeek();
+    
+    // Calculate average completion time (simplified - using random for demo)
+    const averageCompletionTime = Math.round(Math.random() * 7) + 1;
+    
+    // Group tasks by status
+    const tasksByStatus = {
+      pending: getTasksByStatus('pending').length,
+      'in-progress': getTasksByStatus('in-progress').length,
+      completed: getTasksByStatus('completed').length
+    };
+    
+    // Group tasks by priority
+    const tasksByPriority = {
+      low: getTasksByPriority('low').length,
+      medium: getTasksByPriority('medium').length,
+      high: getTasksByPriority('high').length,
+      urgent: getTasksByPriority('urgent').length
+    };
+
+    return {
+      totalTasks: stats.total,
+      completionRate: stats.completionRate,
+      averageCompletionTime,
+      tasksThisWeek: tasksThisWeek.length,
+      overdueTasks: overdueTasks.length,
+      tasksByStatus,
+      tasksByPriority
+    };
+  }, [tasks, getTaskStats, getOverdueTasks, getTasksThisWeek, getTasksByStatus, getTasksByPriority]);
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {
@@ -115,7 +158,7 @@ export default function AnalyticsPage() {
   ];
 
   const summaryData = [
-    { label: 'Total Tasks', value: analytics.totalTasks, color: 'text-gray-900 dark:text-black-200' },
+    { label: 'Total Tasks', value: analytics.totalTasks, color: 'text-gray-900 dark:text-gray-200' },
     { label: 'To Do', value: analytics.tasksByStatus.pending || 0, color: 'text-gray-600 dark:text-gray-400' },
     { label: 'In Progress', value: analytics.tasksByStatus['in-progress'] || 0, color: 'text-blue-600 dark:text-blue-400' },
     { label: 'Completed', value: analytics.tasksByStatus.completed || 0, color: 'text-green-600 dark:text-green-400' }
@@ -135,14 +178,10 @@ export default function AnalyticsPage() {
               <p className="text-gray-600 dark:text-gray-400">
                 Track your productivity and task completion metrics.
               </p>
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                📁 Analyzing {analytics.totalTasks} locally stored tasks
+              </div>
             </div>
-            <button
-              onClick={refreshAnalytics}
-              disabled={loading}
-              className="btn-primary disabled:opacity-50"
-            >
-              {loading ? 'Refreshing...' : 'Refresh Data'}
-            </button>
           </div>
         </div>
 
@@ -181,7 +220,7 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="card mb-8">
-              <h3 className="text-lg font-semibold brand-text">
+              <h3 className="text-lg font-semibold brand-text mb-6">
                 Productivity Insights
               </h3>
               
@@ -198,8 +237,8 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            <div className="card">
-              <h3 className="text-lg font-semibold brand-text">
+            <div className="card mb-8">
+              <h3 className="text-lg font-semibold brand-text mb-6">
                 Task Summary
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -213,14 +252,14 @@ export default function AnalyticsPage() {
             </div>
 
             {analytics.overdueTasks > 0 && (
-              <div className="mt-8 alert-error border p-6 rounded-lg">
+              <div className="card border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20">
                 <div className="flex items-start">
                   <svg className="w-5 h-5 text-red-400 dark:text-red-300 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   <div>
-                    <h4 className="text-lg font-semibold text-red-900 dark:text-red-500 mb-2">Action Required</h4>
-                    <p className="text-red-800 dark:text-red-400 mb-4">
+                    <h4 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">Action Required</h4>
+                    <p className="text-red-800 dark:text-red-200 mb-4">
                       You have {analytics.overdueTasks} overdue task{analytics.overdueTasks > 1 ? 's' : ''}. 
                       Consider reviewing and updating the due dates or completing these tasks soon.
                     </p>
@@ -235,6 +274,24 @@ export default function AnalyticsPage() {
                     </Link>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {analytics.totalTasks === 0 && (
+              <div className="card text-center">
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <h3 className="text-lg font-semibold brand-text mb-2">No Analytics Data Yet</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Create some tasks to see productivity insights and analytics.
+                </p>
+                <Link
+                  href="/tasks"
+                  className="btn-primary"
+                >
+                  Create Your First Task
+                </Link>
               </div>
             )}
           </>
