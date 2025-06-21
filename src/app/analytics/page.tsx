@@ -157,7 +157,7 @@ export default function AnalyticsPage() {
   ];
 
   const summaryData = [
-    { label: 'Total Tasks', value: analytics.totalTasks, color: 'text-gray-900 dark:text-gray-200' },
+    { label: 'Total Tasks', value: analytics.totalTasks, color: 'text-gray-900 dark:text-gray-400' },
     { label: 'To Do', value: analytics.tasksByStatus.pending || 0, color: 'text-gray-600 dark:text-gray-400' },
     { label: 'In Progress', value: analytics.tasksByStatus['in-progress'] || 0, color: 'text-blue-600 dark:text-blue-400' },
     { label: 'Completed', value: analytics.tasksByStatus.completed || 0, color: 'text-green-600 dark:text-green-400' }
