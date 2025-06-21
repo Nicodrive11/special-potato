@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Loading from '@/components/Loading';
-import { Task } from '@/utils/api';
-import apiService from '@/utils/api';
+import { Task, useLocalTasks } from '@/hooks/useLocalTasks';
 import { getPriorityColor, getStatusColor } from '@/utils/ui';
 
 type TaskStatus = 'pending' | 'in-progress' | 'completed';
@@ -17,26 +16,32 @@ interface KanbanColumn {
 }
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    tasks, 
+    loading, 
+    createTask, 
+    updateTask,
+    updateTaskStatus, 
+    deleteTask,
+    getTasksByStatus,
+    resetTasks,
+    clearAllTasks
+  } = useLocalTasks();
+  
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
+  const handleResetTasks = () => {
+    if (confirm('This will reset all tasks to the initial sample data. Are you sure?')) {
+      resetTasks();
+    }
+  };
 
-  const loadTasks = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.getTasks();
-      setTasks(response.tasks || []);
-    } catch (error) {
-      console.error('Error loading tasks:', error);
-    } finally {
-      setLoading(false);
+  const handleClearAllTasks = () => {
+    if (confirm('This will delete all tasks permanently. Are you sure?')) {
+      clearAllTasks();
     }
   };
 
@@ -50,30 +55,14 @@ export default function TasksPage() {
     setShowCreateModal(true);
   };
 
-  const handleDeleteTask = async (taskId: number) => {
+  const handleDeleteTask = (taskId: number) => {
     if (confirm('Are you sure you want to delete this task?')) {
-      try {
-        await apiService.deleteTask(taskId);
-        setTasks(tasks.filter(task => task.id !== taskId));
-      } catch (error) {
-        console.error('Error deleting task:', error);
-      }
+      deleteTask(taskId);
     }
   };
 
-  const handleStatusChange = async (taskId: number, newStatus: TaskStatus) => {
-    const oldTasks = [...tasks];
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, task_status: newStatus } : task
-    ));
-
-    try {
-      await apiService.updateTask(taskId, { task_status: newStatus });
-    } catch (error) {
-      console.error('Error updating task status:', error);
-      setTasks(oldTasks);
-      alert('Failed to update task status. Please try again.');
-    }
+  const handleStatusChange = (taskId: number, newStatus: TaskStatus) => {
+    updateTaskStatus(taskId, newStatus);
   };
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
@@ -107,12 +96,12 @@ export default function TasksPage() {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
+  const handleDrop = (e: React.DragEvent, columnId: TaskStatus) => {
     e.preventDefault();
     setDragOverColumn(null);
     
     if (draggedTask && draggedTask.task_status !== columnId) {
-      await handleStatusChange(draggedTask.id, columnId);
+      handleStatusChange(draggedTask.id, columnId);
     }
     setDraggedTask(null);
   };
@@ -121,17 +110,17 @@ export default function TasksPage() {
     {
       id: 'pending',
       title: 'To Do',
-      tasks: tasks.filter(task => task.task_status === 'pending')
+      tasks: getTasksByStatus('pending')
     },
     {
       id: 'in-progress',
       title: 'In Progress',
-      tasks: tasks.filter(task => task.task_status === 'in-progress')
+      tasks: getTasksByStatus('in-progress')
     },
     {
       id: 'completed',
       title: 'Completed',
-      tasks: tasks.filter(task => task.task_status === 'completed')
+      tasks: getTasksByStatus('completed')
     }
   ];
 
@@ -141,7 +130,62 @@ export default function TasksPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex justify-between items-start">
+          {/* Mobile layout: stacked */}
+          <div className="block sm:hidden">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Tasks
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Manage your tasks with our kanban board system. Drag and drop to change status.
+              </p>
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                📁 Data stored locally in your browser • {tasks.length} total tasks
+              </div>
+            </div>
+            
+            {/* Mobile buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleCreateTask}
+                className="btn-primary w-full"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                New Task
+              </button>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={handleResetTasks}
+                  disabled={loading}
+                  className="btn-secondary disabled:opacity-50 text-sm flex-1"
+                  title="Reset to sample data"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Reset
+                </button>
+                
+                <button
+                  onClick={handleClearAllTasks}
+                  disabled={loading}
+                  className="btn-secondary disabled:opacity-50 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex-1"
+                  title="Clear all tasks"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop layout: side by side */}
+          <div className="hidden sm:flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Tasks
@@ -149,16 +193,49 @@ export default function TasksPage() {
               <p className="text-gray-600 dark:text-gray-400">
                 Manage your tasks with our kanban board system. Drag and drop to change status.
               </p>
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                📁 Data stored locally in your browser • {tasks.length} total tasks
+              </div>
             </div>
-            <button
-              onClick={handleCreateTask}
-              className="btn-primary"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              New Task
-            </button>
+            
+            {/* Desktop buttons */}
+            <div className="flex space-x-3 flex-shrink-0 ml-6">
+              <button
+                onClick={handleCreateTask}
+                className="btn-primary"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                New Task
+              </button>
+              
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleResetTasks}
+                  disabled={loading}
+                  className="btn-secondary disabled:opacity-50 text-sm"
+                  title="Reset to sample data"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Reset Data
+                </button>
+                
+                <button
+                  onClick={handleClearAllTasks}
+                  disabled={loading}
+                  className="btn-secondary disabled:opacity-50 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  title="Clear all tasks"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear All
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -220,10 +297,20 @@ export default function TasksPage() {
         {showCreateModal && (
           <TaskModal
             task={editingTask}
-            onClose={() => setShowCreateModal(false)}
-            onSave={() => {
+            onClose={() => {
               setShowCreateModal(false);
-              loadTasks();
+              setEditingTask(null);
+            }}
+            onSave={(taskData) => {
+              if (editingTask) {
+                // Update existing task
+                updateTask(editingTask.id, taskData);
+              } else {
+                // Create new task
+                createTask(taskData);
+              }
+              setShowCreateModal(false);
+              setEditingTask(null);
             }}
           />
         )}
@@ -363,16 +450,39 @@ function TaskCard({ task, onEdit, onDelete, onStatusChange, onDragStart, onDragE
 interface TaskModalProps {
   task?: Task | null;
   onClose: () => void;
-  onSave: (taskData: Partial<Task>) => void;
+  onSave: (taskData: Omit<Task, 'id' | 'created_date' | 'updated_date'>) => void;
 }
 
 function TaskModal({ task, onClose, onSave }: TaskModalProps) {
   const [formData, setFormData] = useState({
-    title: task?.title || '',
-    description: task?.description || '',
-    priority: task?.priority || 'medium' as TaskPriority,
-    due_date: task?.due_date || ''
+    title: '',
+    description: '',
+    priority: 'medium' as TaskPriority,
+    task_status: 'pending' as TaskStatus,
+    due_date: ''
   });
+
+  // Update form data when task prop changes (for editing)
+  useEffect(() => {
+    if (task) {
+      setFormData({
+        title: task.title || '',
+        description: task.description || '',
+        priority: task.priority || 'medium',
+        task_status: task.task_status || 'pending',
+        due_date: task.due_date || ''
+      });
+    } else {
+      // Reset form for new task
+      setFormData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        task_status: 'pending',
+        due_date: ''
+      });
+    }
+  }, [task]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -383,7 +493,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="card max-w-md w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-500 dark:text-gray-500">
+          <h3 className="text-lg font-semibold brand-text">
             {task ? 'Edit Task' : 'Create New Task'}
           </h3>
           <button
@@ -398,7 +508,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
+            <label className="block text-sm font-medium brand-text mb-1">
               Title
             </label>
             <input
@@ -411,7 +521,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
+            <label className="block text-sm font-medium brand-text mb-1">
               Description
             </label>
             <textarea
@@ -424,7 +534,7 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
+              <label className="block text-sm font-medium brand-text mb-1">
                 Priority
               </label>
               <select
@@ -440,16 +550,31 @@ function TaskModal({ task, onClose, onSave }: TaskModalProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
-                Due Date
+              <label className="block text-sm font-medium brand-text mb-1">
+                Status
               </label>
-              <input
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+              <select
+                value={formData.task_status}
+                onChange={(e) => setFormData({ ...formData, task_status: e.target.value as TaskStatus })}
                 className="input-field"
-              />
+              >
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium brand-text mb-1">
+              Due Date
+            </label>
+            <input
+              type="date"
+              value={formData.due_date}
+              onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+              className="input-field"
+            />
           </div>
 
           <div className="flex space-x-3 pt-4">

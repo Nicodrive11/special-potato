@@ -78,7 +78,7 @@ npm install
 npm run dev
 ```
 
-4. Open (http://localhost:3000) in your browser
+4. Open (http://localhost:3001) in your browser
 
 ### Environment Setup
 The application currently uses sample data for demonstration. To connect to a real API, update the `apiService` configuration in `src/utils/api.ts`.
